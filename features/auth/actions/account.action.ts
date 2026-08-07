@@ -11,6 +11,8 @@ import { createUserSearchFields } from "@/lib/search/create-user-search-fields"
 import { auth } from "@/features/auth/server/auth"
 import { headers } from "next/headers"
 import { getAuthErrorMessage } from "@/features/auth/utils/get-auth-error-message"
+import { extractObjectKey } from "@/lib/storage/object-path"
+import { resolveObjectReadUrl } from "@/lib/storage/r2.server"
 
 const ACTION_NAME = {
   GET_ACCOUNT_PROFILE: "getAccountProfile",
@@ -18,7 +20,7 @@ const ACTION_NAME = {
   CHANGE_PASSWORD: "changePassword",
 } as const
 
-function mapUser(user: {
+async function mapUser(user: {
   id: string
   email: string
   firstName: string
@@ -33,14 +35,15 @@ function mapUser(user: {
   keywords: string[]
   createdAt: Date
   updatedAt: Date
-}): UserWithoutPassword {
+}): Promise<UserWithoutPassword> {
+  const key = extractObjectKey(user.image)
   return {
     id: user.id,
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
     phoneNumber: user.phoneNumber,
-    photoURL: user.image,
+    photoURL: key ? await resolveObjectReadUrl(key) : null,
     roles: user.roles,
     searchFirstName: user.searchFirstName,
     searchLastName: user.searchLastName,
@@ -65,7 +68,7 @@ export const getAccountProfileAction = authActionClient
       return { success: false as const, message: "User not found" }
     }
 
-    return { success: true as const, user: mapUser(user) }
+    return { success: true as const, user: await mapUser(user) }
   })
 
 async function persistAccountProfileUpdate(
@@ -96,7 +99,7 @@ async function persistAccountProfileUpdate(
       firstName,
       lastName,
       phoneNumber,
-      image: photoURL,
+      image: extractObjectKey(photoURL),
       name: `${firstName} ${lastName}`.trim(),
       ...search,
     },
@@ -104,7 +107,7 @@ async function persistAccountProfileUpdate(
 
   return {
     success: true as const,
-    user: mapUser(updated),
+    user: await mapUser(updated),
     message: "Profile updated",
   }
 }

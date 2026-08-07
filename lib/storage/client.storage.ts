@@ -7,7 +7,8 @@ type UploadOptions = {
 }
 
 /**
- * Request short-lived R2 upload intent, then PUT file directly to R2.
+ * Upload to Cloudflare R2 via presigned PUT.
+ * Returns the object key — persist that in the DB, not a public URL.
  */
 export async function uploadFile(
   file: File,
@@ -32,7 +33,7 @@ export async function uploadFile(
     throw new Error(result?.serverError ?? "Failed to create upload intent")
   }
 
-  const { uploadUrl, publicUrl } = result.data
+  const { uploadUrl, key } = result.data
   const response = await fetch(uploadUrl, {
     method: "PUT",
     body: file,
@@ -45,5 +46,5 @@ export async function uploadFile(
     throw new Error(`Upload failed with status ${response.status}`)
   }
 
-  return publicUrl
+  return key
 }

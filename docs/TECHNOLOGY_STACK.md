@@ -94,15 +94,14 @@ R2_ACCESS_KEY_ID=""
 R2_SECRET_ACCESS_KEY=""
 R2_BUCKET=""
 R2_ENDPOINT="https://<account-id>.r2.cloudflarestorage.com"
-R2_PUBLIC_BASE_URL="https://assets.example.com"
 ```
 
 - Set `BETTER_AUTH_URL` to the canonical production URL in Vercel Production,
   and the matching preview/local URL where a separate value is required.
 - Generate `BETTER_AUTH_SECRET` with a cryptographically secure generator. It
   must be stable for an environment; changing it invalidates existing sessions.
-- `R2_PUBLIC_BASE_URL` is optional. Use it only for a configured public custom
-  domain. Do not use the `r2.dev` endpoint for production delivery.
+- Object reads use short-lived signed R2 GET URLs. Persist object keys in the
+  database, not public CDN URLs.
 - Configure required values in Vercel separately for Development, Preview, and
   Production. Preview must never point at production data unless that is an
   explicit, reviewed decision.
@@ -141,6 +140,8 @@ R2_PUBLIC_BASE_URL="https://assets.example.com"
 
 ## Cloudflare R2
 
+Setup walkthrough: `docs/CLOUDFLARE_STORAGE_SETUP.md`.
+
 - R2 stores binary objects; PostgreSQL stores metadata, ownership, visibility,
   content type, size, object key, and lifecycle state.
 - Generate opaque, server-controlled object keys. Never use raw user filenames
@@ -150,8 +151,8 @@ R2_PUBLIC_BASE_URL="https://assets.example.com"
   short-lived, key-scoped presigned upload URL -> client uploads directly ->
   server verifies and records the object metadata.
 - Preferred download flow: authorize on the server, then return a short-lived
-  signed download URL for private files. Public assets may use the configured
-  custom domain only when their public visibility is intentional.
+  signed download URL. Persist object keys in PostgreSQL; do not store public
+  CDN URLs.
 - Enforce allowed types and byte limits both before signing and when recording
   completion. Scan or quarantine untrusted files before making them available
   where the product's risk requires it.
@@ -249,5 +250,6 @@ Track usage from day one. Alert before limits, cap upload sizes, cache public
 - [Neon pricing](https://neon.com/pricing)
 - [Cloudflare R2 pricing](https://developers.cloudflare.com/r2/pricing/)
 - [Cloudflare R2 limits](https://developers.cloudflare.com/r2/platform/limits/)
+- [Cloudflare storage setup (this repo)](./CLOUDFLARE_STORAGE_SETUP.md)
 - [Better Auth installation](https://better-auth.com/docs/installation)
 - [Better Auth Next.js integration](https://better-auth.com/docs/integrations/next)

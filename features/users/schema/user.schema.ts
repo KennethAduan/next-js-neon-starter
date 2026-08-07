@@ -48,7 +48,10 @@ export const UserProfileUpdateSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }),
   lastName: z.string().min(1, { message: "Last name is required" }),
   phoneNumber: z.string(),
-  photoURL: z.union([z.url({ message: "Invalid photo URL" }), z.null()]),
+  photoURL: z.union([
+    z.string().min(1, { message: "Invalid photo path" }),
+    z.null(),
+  ]),
 })
 
 export type UserProfileUpdate = z.infer<typeof UserProfileUpdateSchema>

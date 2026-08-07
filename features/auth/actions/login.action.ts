@@ -8,8 +8,10 @@ import { deleteServerSession } from "@/features/auth/server/session.server"
 import { prisma } from "@/lib/prisma"
 import type { UserWithoutPassword } from "@/features/users/schema/user.schema"
 import { getAuthErrorMessage } from "@/features/auth/utils/get-auth-error-message"
+import { extractObjectKey } from "@/lib/storage/object-path"
+import { resolveObjectReadUrl } from "@/lib/storage/r2.server"
 
-function mapUser(user: {
+async function mapUser(user: {
   id: string
   email: string
   firstName: string
@@ -24,14 +26,15 @@ function mapUser(user: {
   keywords: string[]
   createdAt: Date
   updatedAt: Date
-}): UserWithoutPassword {
+}): Promise<UserWithoutPassword> {
+  const key = extractObjectKey(user.image)
   return {
     id: user.id,
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
     phoneNumber: user.phoneNumber,
-    photoURL: user.image,
+    photoURL: key ? await resolveObjectReadUrl(key) : null,
     roles: user.roles,
     searchFirstName: user.searchFirstName,
     searchLastName: user.searchLastName,
@@ -74,7 +77,7 @@ export const LoginAction = actionClient
       return {
         success: true,
         message: "Login successful",
-        user: mapUser(user),
+        user: await mapUser(user),
       }
     } catch (error) {
       return {

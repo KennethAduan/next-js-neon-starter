@@ -9,7 +9,8 @@ import { nanoid } from "nanoid"
 import { env } from "@/config/env"
 
 const UPLOAD_URL_EXPIRES_IN = 60 * 5
-const DOWNLOAD_URL_EXPIRES_IN = 60 * 15
+/** Long enough for local/dev avatar display without constant refresh. */
+const DOWNLOAD_URL_EXPIRES_IN = 60 * 60 * 24 * 7
 
 function getR2Client() {
   return new S3Client({
@@ -19,6 +20,9 @@ function getR2Client() {
       accessKeyId: env.R2_ACCESS_KEY_ID,
       secretAccessKey: env.R2_SECRET_ACCESS_KEY,
     },
+    // Browser PUT cannot send AWS SDK flexible checksum headers.
+    requestChecksumCalculation: "WHEN_REQUIRED",
+    responseChecksumValidation: "WHEN_REQUIRED",
   })
 }
 
@@ -31,11 +35,10 @@ export function buildObjectKey(parts: {
   return `${parts.folder}/${parts.userId}/${nanoid()}.${safeExt}`
 }
 
-export function publicObjectUrl(key: string): string {
-  if (env.R2_PUBLIC_BASE_URL) {
-    return `${env.R2_PUBLIC_BASE_URL.replace(/\/$/, "")}/${key}`
-  }
-  return `${env.R2_ENDPOINT.replace(/\/$/, "")}/${env.R2_BUCKET}/${key}`
+/** Browser-ready Cloudflare URL via signed GET on *.r2.cloudflarestorage.com. */
+export async function resolveObjectReadUrl(key: string): Promise<string> {
+  const { downloadUrl } = await createPresignedDownloadUrl(key)
+  return downloadUrl
 }
 
 export async function createPresignedUploadUrl(options: {
@@ -44,21 +47,22 @@ export async function createPresignedUploadUrl(options: {
   contentLength?: number
 }) {
   const client = getR2Client()
+  // Sign only Content-Type + host so browser PUT matches signature.
+  // Do not bind Content-Length — fetch sets it, but signing it is brittle.
   const command = new PutObjectCommand({
     Bucket: env.R2_BUCKET,
     Key: options.key,
     ContentType: options.contentType,
-    ...(options.contentLength ? { ContentLength: options.contentLength } : {}),
   })
 
   const uploadUrl = await getSignedUrl(client, command, {
     expiresIn: UPLOAD_URL_EXPIRES_IN,
+    signableHeaders: new Set(["content-type"]),
   })
 
   return {
     uploadUrl,
     key: options.key,
-    publicUrl: publicObjectUrl(options.key),
     expiresIn: UPLOAD_URL_EXPIRES_IN,
   }
 }

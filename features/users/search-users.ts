@@ -1,15 +1,15 @@
 "use server"
 
 import { authActionClient } from "@/lib/safe.action"
-import {
-  type UserWithoutPassword,
-} from "@/features/users/schema/user.schema"
+import type { UserWithoutPassword } from "@/features/users/schema/user.schema"
 import { mergeById } from "@/lib/search/merge-by-id"
 import { prefixBounds } from "@/lib/search/prefix-bounds"
 import { throwSearchActionError } from "@/lib/search/throw-search-action-error"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 import { Prisma } from "@/generated/prisma/client"
+import { extractObjectKey } from "@/lib/storage/object-path"
+import { resolveObjectReadUrl } from "@/lib/storage/r2.server"
 
 const SearchUsersInputSchema = z.object({
   term: z.string().trim().min(1, { message: "Search term is required" }),
@@ -19,7 +19,7 @@ const SearchUsersInputSchema = z.object({
 
 export type SearchUsersInput = z.infer<typeof SearchUsersInputSchema>
 
-function mapUser(user: {
+async function mapUser(user: {
   id: string
   email: string
   firstName: string
@@ -34,14 +34,15 @@ function mapUser(user: {
   keywords: string[]
   createdAt: Date
   updatedAt: Date
-}): UserWithoutPassword {
+}): Promise<UserWithoutPassword> {
+  const key = extractObjectKey(user.image)
   return {
     id: user.id,
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
     phoneNumber: user.phoneNumber,
-    photoURL: user.image,
+    photoURL: key ? await resolveObjectReadUrl(key) : null,
     roles: user.roles,
     searchFirstName: user.searchFirstName,
     searchLastName: user.searchLastName,
@@ -74,7 +75,7 @@ async function queryUsersByPrefixField(
     orderBy: { [field]: "asc" },
   })
 
-  return users.map(mapUser)
+  return Promise.all(users.map(mapUser))
 }
 
 /**

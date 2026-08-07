@@ -14,6 +14,8 @@ import { getAuthErrorMessage } from "@/features/auth/utils/get-auth-error-messag
 import { createUserSearchFields } from "@/lib/search/create-user-search-fields"
 import { auth } from "@/features/auth/server/auth"
 import { headers } from "next/headers"
+import { extractObjectKey } from "@/lib/storage/object-path"
+import { resolveObjectReadUrl } from "@/lib/storage/r2.server"
 
 export const RegsiterAdminAction = actionClient
   .metadata({ actionName: "registerAdmin" })
@@ -88,7 +90,9 @@ export const RegsiterAdminAction = actionClient
         email: admin.email,
         roles: admin.roles,
         phoneNumber: admin.phoneNumber,
-        photoURL: admin.image,
+        photoURL: extractObjectKey(admin.image)
+          ? await resolveObjectReadUrl(extractObjectKey(admin.image)!)
+          : null,
         searchFirstName: admin.searchFirstName,
         searchLastName: admin.searchLastName,
         searchFullName: admin.searchFullName,
