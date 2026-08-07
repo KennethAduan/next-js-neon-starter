@@ -1,0 +1,58 @@
+export const BASE_ROUTE = "/"
+
+const TEST_UI_ROUTES = {
+  ROOT: "/test-ui",
+}
+
+const HIDDEN_ROUTES = {
+  REGISTER_ADMIN: "/register-admin",
+}
+
+const AUTH_ROUTES = {
+  LOGIN: "/login",
+  FORGOT_PASSWORD: "/forgot-password",
+  ACCOUNT: "/account",
+  SECURITY: "/security",
+}
+
+const SIDEBAR_ROUTES = {
+  HOME: BASE_ROUTE,
+  CLIENTS: "/clients",
+  INVESTMENTS: "/investment",
+  PAYOUT_SCHEDULES: "/payout-schedules",
+  CALENDAR: "/calendar",
+  REMITTANCES: "/remittances",
+  CONTRACTS: "/contracts",
+  REPORTS: "/reports",
+}
+export const ROUTES = {
+  HOME: BASE_ROUTE,
+  LOGIN: AUTH_ROUTES.LOGIN,
+  FORGOT_PASSWORD: AUTH_ROUTES.FORGOT_PASSWORD,
+  ACCOUNT: AUTH_ROUTES.ACCOUNT,
+  SECURITY: AUTH_ROUTES.SECURITY,
+  CLIENTS: SIDEBAR_ROUTES.CLIENTS,
+  INVESTMENTS: SIDEBAR_ROUTES.INVESTMENTS,
+  PAYOUT_SCHEDULES: SIDEBAR_ROUTES.PAYOUT_SCHEDULES,
+  CALENDAR: SIDEBAR_ROUTES.CALENDAR,
+  REMITTANCES: SIDEBAR_ROUTES.REMITTANCES,
+  CONTRACTS: SIDEBAR_ROUTES.CONTRACTS,
+  REPORTS: SIDEBAR_ROUTES.REPORTS,
+  TEST_UI: TEST_UI_ROUTES.ROOT,
+  REGISTER_ADMIN: HIDDEN_ROUTES.REGISTER_ADMIN,
+}
+
+/** Routes under `app/(protected)` — require a valid session in proxy/layout. */
+export const PROTECTED_ROUTES = [
+  ROUTES.HOME,
+  ROUTES.CLIENTS,
+  ROUTES.INVESTMENTS,
+  ROUTES.ACCOUNT,
+  ROUTES.SECURITY,
+] as const
+
+/** Public auth pages — redirect to home when already authenticated. */
+export const PUBLIC_AUTH_ROUTES = [
+  ROUTES.LOGIN,
+  ROUTES.FORGOT_PASSWORD,
+] as const

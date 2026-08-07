@@ -1,0 +1,118 @@
+// Prisma schema — Neon PostgreSQL + Better Auth core tables + app models.
+// Run: bun run db:generate && bun run db:migrate
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ClientStatus {
+  active
+  inactive
+  blacklisted
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  firstName       String   @default("")
+  lastName        String   @default("")
+  phoneNumber     String   @default("")
+  roles           String[] @default([])
+  searchFirstName String   @default("")
+  searchLastName  String   @default("")
+  searchFullName  String   @default("")
+  searchEmail     String   @default("")
+  keywords        String[] @default([])
+
+  sessions Session[]
+  accounts Account[]
+
+  @@index([searchFullName])
+  @@index([searchEmail])
+  @@index([searchFirstName])
+  @@index([searchLastName])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model Client {
+  id                     String       @id @default(uuid())
+  fullName               String
+  email                  String?
+  phone                  String?
+  address                String?
+  nationality            String?
+  totalInvested          Float        @default(0)
+  totalActiveInvestments Int          @default(0)
+  status                 ClientStatus @default(active)
+  searchFullName         String       @default("")
+  searchEmail            String?
+  searchPhone            String?
+  keywords               String[]     @default([])
+  notes                  String?
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+
+  @@index([searchFullName])
+  @@index([searchEmail])
+  @@index([searchPhone])
+  @@index([status])
+  @@map("client")
+}
