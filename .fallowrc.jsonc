@@ -1,0 +1,58 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  // Gate policy (CI + pre-push): fail only on blocking findings.
+  // - dead code: unused files/exports/deps, cycles, boundary violations
+  // - duplication: copy-paste clones
+  // - health: functions above complexity/CRAP thresholds
+  // Advisory output (hotspots, refactoring targets, large functions) is
+  // informational only — use `bun run fallow:report` locally.
+  "health": {
+    "maxCyclomatic": 12,
+    "maxCognitive": 10,
+    "maxCrap": 100,
+    "ignore": ["**/*.generated.ts", "**/app/*hidden*/**"],
+    "thresholdOverrides": [
+      {
+        "files": ["src/legacy/**"],
+        "functions": ["parseLegacy"],
+        "maxCyclomatic": 40,
+        "maxCognitive": 35,
+        "reason": "Queued legacy parser cleanup",
+      },
+      {
+        "files": ["src/components/**", "src/hooks/**"],
+        "maxCyclomatic": 15,
+        "maxCognitive": 15,
+        "reason": "Extended allowance for complex UI rendering pipelines and hooks",
+      },
+      {
+        "files": ["components/data-table/**"],
+        "maxCyclomatic": 15,
+        "maxCognitive": 15,
+        "reason": "Data table filters coordinate popover state, calendar modes, and URL sync",
+      },
+    ],
+  },
+  "duplicates": {
+    "threshold": 20,
+  },
+  "audit": {
+    "cacheMaxAgeDays": 0,
+    "gate": "new-only",
+  },
+  "rules": {
+    "unused-files": "error",
+    "unused-exports": "error",
+    "unused-types": "error",
+    "unused-dependencies": "error",
+    "unused-dev-dependencies": "warn",
+    "unused-enum-members": "error",
+    "unused-class-members": "error",
+    "unresolved-imports": "error",
+    "unlisted-dependencies": "error",
+    "duplicate-exports": "error",
+    "circular-dependencies": "error",
+    "boundary-violation": "error",
+    "coverage-gaps": "off",
+  },
+}

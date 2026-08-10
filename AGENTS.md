@@ -42,6 +42,17 @@ This project uses feature-based architecture.
 - Do not reintroduce Firebase.
 - Follow existing feature patterns before adding new abstractions.
 
+## After code changes
+
+When done writing or changing code, always run both before considering work finished:
+
+1. React Doctor — follow `/Users/kenneth/.claude/skills/react-doctor/SKILL.md`
+   (project shortcut: `bun run doctor`; prefer `npx react-doctor@latest --verbose --diff` for changed-file regression checks).
+2. Fallow — follow `/Users/kenneth/.claude/skills/fallow/SKILL.md`
+   (project shortcut: `bun run fallow`).
+
+Fix issues they report (or regressions) before stopping. Do not skip either step.
+
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
 
