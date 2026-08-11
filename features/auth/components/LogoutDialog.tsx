@@ -28,8 +28,10 @@ const LogoutDialog = ({ open, onOpenChange }: LogoutDialogProps) => {
   const router = useRouter()
   const setUserAuth = useSetAtom(userAuthAtom)
   const { executeAsync: logoutAction, isExecuting } = useAction(LogoutAction, {
-    onSuccess: ({ data }) => {
+    onSuccess: async ({ data }) => {
       if (data?.success) {
+        // Cookie may already be cleared by LogoutAction; ignore client errors.
+        await authClient.signOut().catch(() => undefined)
         onOpenChange(false)
         setUserAuth(null)
         router.replace(ROUTES.HOME)
@@ -41,8 +43,14 @@ const LogoutDialog = ({ open, onOpenChange }: LogoutDialogProps) => {
   })
 
   const handleLogout = async () => {
-    await authClient.signOut()
-    await logoutAction()
+    // Server first — still has session cookie. Client sign-out first makes
+    // proxy redirect the action POST (protected path → /login HTML) and
+    // yields "An unexpected response was received from the server."
+    try {
+      await logoutAction()
+    } catch {
+      sileo.error({ title: "Logout failed" })
+    }
   }
   const handleCancel = () => {
     onOpenChange(false)

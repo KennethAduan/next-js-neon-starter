@@ -36,8 +36,11 @@ app/api/auth/[...all]/route.ts  # Better Auth handler
 
 ### Logout
 
-1. `LogoutDialog` calls `authClient.signOut` + `LogoutAction`.
-2. Clears jotai atom and redirects.
+1. `LogoutDialog` calls `LogoutAction` first (session cookie still present).
+2. On success: `authClient.signOut` (ignore errors), clear jotai atom, redirect home.
+3. Do **not** client-sign-out before the server action — proxy will redirect the
+   action POST from a protected path to `/login` HTML and the client throws
+   "An unexpected response was received from the server."
 
 ### Password change
 
