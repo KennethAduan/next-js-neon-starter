@@ -61,7 +61,7 @@ export function DataTableSortList<TData>({
   const { id, labelId, descriptionId, open, setOpen, addButtonRef } =
     useDataTablePanel()
 
-  const sorting = table.getState().sorting
+  const sorting = table.state.sorting
   const onSortingChange = table.setSorting
 
   // fallow-ignore-next-line complexity

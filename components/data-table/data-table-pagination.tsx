@@ -34,7 +34,7 @@ export function DataTablePagination<TData>({
   const canNextPage = cursorPagination?.canNextPage ?? table.getCanNextPage()
   const pageLabel =
     cursorPagination?.pageLabel ??
-    `Page ${table.getState().pagination.pageIndex + 1} of ${table.getPageCount()}`
+    `Page ${table.state.pagination.pageIndex + 1} of ${table.getPageCount()}`
 
   return (
     <div
@@ -52,13 +52,13 @@ export function DataTablePagination<TData>({
         <div className="flex items-center gap-2">
           <p className="text-sm font-medium whitespace-nowrap">Rows per page</p>
           <Select
-            value={`${table.getState().pagination.pageSize}`}
+            value={`${table.state.pagination.pageSize}`}
             onValueChange={(value) => {
               table.setPageSize(Number(value))
             }}
           >
             <SelectTrigger className="h-8 w-18 data-size:h-8">
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
+              <SelectValue placeholder={table.state.pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
               {pageSizeOptions.map((pageSize) => (

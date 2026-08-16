@@ -2,20 +2,13 @@
 
 import {
   type ColumnFiltersState,
-  getCoreRowModel,
-  getFacetedMinMaxValues,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   type PaginationState,
   type RowSelectionState,
   type SortingState,
   type TableOptions,
   type TableState,
   type Updater,
-  useReactTable,
+  useTable,
   type VisibilityState,
 } from "@/lib/tanstack-table";
 import {
@@ -49,7 +42,6 @@ interface UseDataTableProps<TData>
       TableOptions<TData>,
       | "state"
       | "pageCount"
-      | "getCoreRowModel"
       | "manualFiltering"
       | "manualPagination"
       | "manualSorting"
@@ -277,8 +269,7 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
     [debouncedSetFilterValues, filterableColumns, enableAdvancedFilter],
   );
 
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const table = useReactTable({
+  const table = useTable({
     ...tableProps,
     columns,
     initialState,
@@ -300,13 +291,6 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
     onSortingChange,
     onColumnFiltersChange,
     onColumnVisibilityChange: setColumnVisibility,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
     manualPagination: true,
     manualSorting: true,
     manualFiltering: true,
