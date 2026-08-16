@@ -4,7 +4,7 @@ import {
   IconChevronsLeft,
   IconChevronsRight,
 } from "@tabler/icons-react"
-import type { Table } from "@tanstack/react-table"
+import type { Table } from "@/lib/tanstack-table"
 
 import { Button } from "@/components/ui/button"
 import {

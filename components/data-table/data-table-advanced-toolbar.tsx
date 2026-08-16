@@ -1,4 +1,4 @@
-import type { Table } from "@tanstack/react-table"
+import type { Table } from "@/lib/tanstack-table"
 import type * as React from "react"
 
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options"

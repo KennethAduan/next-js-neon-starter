@@ -1,4 +1,3 @@
-import type { Column } from "@tanstack/react-table";
 import { dataTableConfig } from "@/config/data-table";
 import type {
   ExtendedColumnFilter,
@@ -6,6 +5,7 @@ import type {
   FilterVariant,
 } from "@/types/data-table";
 import { formatDate } from "@/lib/format";
+import { Column } from "./tanstack-table";
 
 // fallow-ignore-next-line complexity
 export function getCommonPinningStyles<TData>({
@@ -16,21 +16,23 @@ export function getCommonPinningStyles<TData>({
   withBorder?: boolean;
 }): React.CSSProperties {
   const isPinned = column.getIsPinned();
-  const isLastLeftPinnedColumn =
-    isPinned === "left" && column.getIsLastColumn("left");
-  const isFirstRightPinnedColumn =
-    isPinned === "right" && column.getIsFirstColumn("right");
+  const isLastStartPinnedColumn =
+    isPinned === "start" && column.getIsLastColumn("start");
+  const isFirstEndPinnedColumn =
+    isPinned === "end" && column.getIsFirstColumn("end");
 
   return {
     boxShadow: withBorder
-      ? isLastLeftPinnedColumn
+      ? isLastStartPinnedColumn
         ? "-4px 0 4px -4px var(--border) inset"
-        : isFirstRightPinnedColumn
+        : isFirstEndPinnedColumn
           ? "4px 0 4px -4px var(--border) inset"
           : undefined
       : undefined,
-    left: isPinned === "left" ? `${column.getStart("left")}px` : undefined,
-    right: isPinned === "right" ? `${column.getAfter("right")}px` : undefined,
+    insetInlineStart:
+      isPinned === "start" ? `${column.getStart("start")}px` : undefined,
+    insetInlineEnd:
+      isPinned === "end" ? `${column.getAfter("end")}px` : undefined,
     opacity: isPinned ? 0.97 : 1,
     position: isPinned ? "sticky" : "relative",
     background: isPinned ? "var(--background)" : "var(--background)",
@@ -64,7 +66,7 @@ export function getDefaultFilterOperator(filterVariant: FilterVariant) {
 }
 
 function normalizeDateFilterValue(
-  value: ExtendedColumnFilter<unknown>["value"]
+  value: ExtendedColumnFilter<unknown>["value"],
 ) {
   if (Array.isArray(value)) {
     return value.filter(Boolean);
@@ -83,7 +85,7 @@ function toOptionalDate(value: unknown) {
 
 export function getDateFilterValues<TData>(
   filter: ExtendedColumnFilter<TData>,
-  placeholder = "Pick a date"
+  placeholder = "Pick a date",
 ) {
   const dateValue = normalizeDateFilterValue(filter.value);
   const startDate = toOptionalDate(dateValue[0]);

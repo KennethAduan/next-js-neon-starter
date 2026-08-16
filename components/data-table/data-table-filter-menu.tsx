@@ -7,7 +7,7 @@ import {
   IconTypography,
 } from "@tabler/icons-react"
 import * as React from "react"
-import type { Column, Table } from "@tanstack/react-table"
+import type { Column, Table } from "@/lib/tanstack-table"
 
 import type { ExtendedColumnFilter } from "@/types/data-table"
 import { Button } from "@/components/ui/button"

@@ -1,15 +1,15 @@
-import type { Column } from "@tanstack/react-table"
+import type { Column } from "@/lib/tanstack-table";
 
-import type { ExtendedColumnFilter } from "@/types/data-table"
-import { getFilterOperators } from "@/lib/data-table"
-import { useFilterItemKeyDown } from "@/hooks/use-filter-item-key-down"
-import { useFilterItemSelectorState } from "@/hooks/use-filter-item-selector-state"
+import type { ExtendedColumnFilter } from "@/types/data-table";
+import { getFilterOperators } from "@/lib/data-table";
+import { useFilterItemKeyDown } from "@/hooks/use-filter-item-key-down";
+import { useFilterItemSelectorState } from "@/hooks/use-filter-item-selector-state";
 
 interface UseDataTableFilterItemControlsProps<TData> {
-  filter: ExtendedColumnFilter<TData>
-  filterItemId: string
-  columns: Array<Column<TData>>
-  onFilterRemove: (filterId: string) => void
+  filter: ExtendedColumnFilter<TData>;
+  filterItemId: string;
+  columns: Array<Column<TData>>;
+  onFilterRemove: (filterId: string) => void;
 }
 
 function useDataTableFilterItemControls<TData>({
@@ -18,18 +18,18 @@ function useDataTableFilterItemControls<TData>({
   columns,
   onFilterRemove,
 }: UseDataTableFilterItemControlsProps<TData>) {
-  const selectorState = useFilterItemSelectorState()
+  const selectorState = useFilterItemSelectorState();
   const column = columns.find(
-    (availableColumn) => availableColumn.id === filter.id
-  )
+    (availableColumn) => availableColumn.id === filter.id,
+  );
 
   const onItemKeyDown = useFilterItemKeyDown(
     filter.filterId,
     selectorState.showFieldSelector,
     selectorState.showOperatorSelector,
     selectorState.showValueSelector,
-    onFilterRemove
-  )
+    onFilterRemove,
+  );
 
   return {
     ...selectorState,
@@ -40,7 +40,7 @@ function useDataTableFilterItemControls<TData>({
     inputId: `${filterItemId}-input`,
     filterOperators: getFilterOperators(filter.variant),
     onItemKeyDown,
-  }
+  };
 }
 
-export { useDataTableFilterItemControls }
+export { useDataTableFilterItemControls };

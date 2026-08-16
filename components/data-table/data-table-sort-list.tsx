@@ -5,7 +5,7 @@ import {
   IconGripVertical,
 } from "@tabler/icons-react"
 import * as React from "react"
-import type { ColumnSort, Table } from "@tanstack/react-table"
+import type { ColumnSort, Table } from "@/lib/tanstack-table"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"

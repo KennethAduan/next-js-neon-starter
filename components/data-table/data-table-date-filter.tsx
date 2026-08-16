@@ -1,4 +1,4 @@
-import type { Column } from "@tanstack/react-table"
+import type { Column } from "@/lib/tanstack-table"
 import { IconCalendarEvent, IconCircleX } from "@tabler/icons-react"
 import * as React from "react"
 import type { DateRange } from "react-day-picker"

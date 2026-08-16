@@ -6,7 +6,7 @@ import {
 } from "@tabler/icons-react"
 import { parseAsStringEnum, useQueryState } from "nuqs"
 import * as React from "react"
-import type { Column, ColumnMeta, Table } from "@tanstack/react-table"
+import type { Column, ColumnMeta, Table } from "@/lib/tanstack-table"
 
 import type {
   ExtendedColumnFilter,

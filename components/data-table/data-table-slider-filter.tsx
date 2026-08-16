@@ -1,6 +1,6 @@
 import { IconCirclePlus, IconCircleX } from "@tabler/icons-react"
 import * as React from "react"
-import type { Column } from "@tanstack/react-table"
+import type { Column } from "@/lib/tanstack-table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"

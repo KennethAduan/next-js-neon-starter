@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import type { ColumnDef } from "@tanstack/react-table"
-import { IconDotsVertical } from "@tabler/icons-react"
+import type { ColumnDef } from "@/lib/tanstack-table";
+import { IconDotsVertical } from "@tabler/icons-react";
 
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   USER_ROLE_OPTIONS,
   USER_STATUS_OPTIONS,
   type User,
-} from "../_mock/users"
+} from "../_mock/users";
 
 const statusVariantMap: Record<
   User["status"],
@@ -26,7 +26,7 @@ const statusVariantMap: Record<
   active: "default",
   pending: "outline",
   inactive: "secondary",
-}
+};
 
 export const userColumns: ColumnDef<User>[] = [
   {
@@ -63,12 +63,12 @@ export const userColumns: ColumnDef<User>[] = [
       <DataTableColumnHeader column={column} label="Status" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue<User["status"]>("status")
+      const status = row.getValue<User["status"]>("status");
       return (
         <Badge variant={statusVariantMap[status]} className="capitalize">
           {status}
         </Badge>
-      )
+      );
     },
     meta: {
       label: "Status",
@@ -152,4 +152,4 @@ export const userColumns: ColumnDef<User>[] = [
       </DropdownMenu>
     ),
   },
-]
+];

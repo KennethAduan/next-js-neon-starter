@@ -1,4 +1,4 @@
-import type { Column } from "@tanstack/react-table"
+import type { Column } from "@/lib/tanstack-table"
 import { IconChevronDown,IconArrowsDownUp, IconChevronUp, IconEyeOff, IconX } from "@tabler/icons-react"
 
 import {

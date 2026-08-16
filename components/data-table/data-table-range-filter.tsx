@@ -1,5 +1,5 @@
 import * as React from "react"
-import type { Column } from "@tanstack/react-table"
+import type { Column } from "@/lib/tanstack-table"
 
 import type { ExtendedColumnFilter } from "@/types/data-table"
 import { Input } from "@/components/ui/input"

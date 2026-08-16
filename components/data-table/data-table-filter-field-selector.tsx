@@ -1,5 +1,5 @@
 import { IconArrowsDownUp, IconCheck } from "@tabler/icons-react"
-import type { Column } from "@tanstack/react-table"
+import type { Column } from "@/lib/tanstack-table"
 
 import type { ExtendedColumnFilter } from "@/types/data-table"
 import { Button } from "@/components/ui/button"

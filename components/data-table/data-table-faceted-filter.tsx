@@ -1,4 +1,4 @@
-import type { Column } from "@tanstack/react-table"
+import type { Column } from "@/lib/tanstack-table"
 import { IconCheck, IconCirclePlus, IconCircleX } from "@tabler/icons-react"
 import * as React from "react"
 
