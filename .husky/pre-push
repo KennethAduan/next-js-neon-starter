@@ -1,0 +1,53 @@
+#!/usr/bin/env sh
+set -e
+
+zero="0000000000000000000000000000000000000000"
+
+run_changed_checks() {
+  base="$1"
+  bunx react-doctor --diff "$base" --no-score
+  bunx fallow audit --summary --changed-since "$base"
+}
+
+default_base_branch() {
+  if git rev-parse --verify origin/main >/dev/null 2>&1; then
+    printf '%s\n' "origin/main"
+  elif git rev-parse --verify origin/master >/dev/null 2>&1; then
+    printf '%s\n' "origin/master"
+  elif git rev-parse --verify main >/dev/null 2>&1; then
+    printf '%s\n' "main"
+  else
+    printf '%s\n' "master"
+  fi
+}
+
+resolve_push_base() {
+  remote_sha="$1"
+  if [ "$remote_sha" = "$zero" ] || [ -z "$remote_sha" ]; then
+    default_base_branch
+    return
+  fi
+
+  printf '%s\n' "$remote_sha"
+}
+
+ran=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "$local_sha" = "$zero" ]; then
+    continue
+  fi
+
+  base=$(resolve_push_base "$remote_sha")
+  run_changed_checks "$base"
+  ran=1
+done
+
+if [ "$ran" -eq 0 ]; then
+  if git rev-parse --verify "@{upstream}" >/dev/null 2>&1; then
+    base=$(git merge-base HEAD "@{upstream}")
+  else
+    base=$(default_base_branch)
+  fi
+
+  run_changed_checks "$base"
+fi
