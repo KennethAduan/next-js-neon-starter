@@ -27,7 +27,7 @@ const AppSidebarHeader = () => {
             </div>
             <div className="grid flex-1 text-center leading-tight group-data-[collapsible=icon]:hidden">
               <span className="text-lg font-bold text-primary">
-                Firebase Starter
+               Neon Starter
               </span>
             </div>
           </SidebarMenuButton>
