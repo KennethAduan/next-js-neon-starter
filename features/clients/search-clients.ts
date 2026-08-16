@@ -32,7 +32,6 @@ function mapClient(client: {
   searchFullName: string
   searchEmail: string | null
   searchPhone: string | null
-  keywords: string[]
   notes: string | null
   createdAt: Date
   updatedAt: Date
@@ -50,7 +49,6 @@ function mapClient(client: {
     searchFullName: client.searchFullName,
     searchEmail: client.searchEmail ?? undefined,
     searchPhone: client.searchPhone ?? undefined,
-    keywords: client.keywords,
     notes: client.notes ?? undefined,
     createdAt: client.createdAt,
     updatedAt: client.updatedAt,

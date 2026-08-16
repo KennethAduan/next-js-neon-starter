@@ -70,12 +70,6 @@ export const auth = betterAuth({
         defaultValue: "",
         input: false,
       },
-      keywords: {
-        type: "string[]",
-        required: false,
-        defaultValue: [],
-        input: false,
-      },
     },
   },
   trustedOrigins: [env.BETTER_AUTH_URL, env.APP_URL],

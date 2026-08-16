@@ -5,7 +5,6 @@ export const ClientSearchFieldsSchema = z.object({
   searchFullName: z.string(),
   searchEmail: z.string().optional(),
   searchPhone: z.string().optional(),
-  keywords: z.array(z.string()).default([]),
 })
 
 export const ClientSchema = z.object({
@@ -28,7 +27,6 @@ export const ClientClientWritableOmit = {
   searchFullName: true,
   searchEmail: true,
   searchPhone: true,
-  keywords: true,
 } as const
 
 export type ClientSearchFields = z.infer<typeof ClientSearchFieldsSchema>

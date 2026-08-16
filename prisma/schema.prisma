@@ -33,7 +33,6 @@ model User {
   searchLastName  String   @default("")
   searchFullName  String   @default("")
   searchEmail     String   @default("")
-  keywords        String[] @default([])
 
   sessions Session[]
   accounts Account[]
@@ -105,7 +104,6 @@ model Client {
   searchFullName         String       @default("")
   searchEmail            String?
   searchPhone            String?
-  keywords               String[]     @default([])
   notes                  String?
   createdAt              DateTime     @default(now())
   updatedAt              DateTime     @updatedAt

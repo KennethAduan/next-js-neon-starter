@@ -2,14 +2,13 @@
 
 import { authActionClient } from "@/lib/safe.action"
 import type { UserWithoutPassword } from "@/features/users/schema/user.schema"
+import { mapUserToClient } from "@/features/users/server/map-user"
 import { mergeById } from "@/lib/search/merge-by-id"
 import { prefixBounds } from "@/lib/search/prefix-bounds"
 import { throwSearchActionError } from "@/lib/search/throw-search-action-error"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 import { Prisma } from "@/generated/prisma/client"
-import { extractObjectKey } from "@/lib/storage/object-path"
-import { resolveObjectReadUrl } from "@/lib/storage/r2.server"
 
 const SearchUsersInputSchema = z.object({
   term: z.string().trim().min(1, { message: "Search term is required" }),
@@ -18,41 +17,6 @@ const SearchUsersInputSchema = z.object({
 })
 
 export type SearchUsersInput = z.infer<typeof SearchUsersInputSchema>
-
-async function mapUser(user: {
-  id: string
-  email: string
-  firstName: string
-  lastName: string
-  phoneNumber: string
-  image: string | null
-  roles: string[]
-  searchFirstName: string
-  searchLastName: string
-  searchFullName: string
-  searchEmail: string
-  keywords: string[]
-  createdAt: Date
-  updatedAt: Date
-}): Promise<UserWithoutPassword> {
-  const key = extractObjectKey(user.image)
-  return {
-    id: user.id,
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    phoneNumber: user.phoneNumber,
-    photoURL: key ? await resolveObjectReadUrl(key) : null,
-    roles: user.roles,
-    searchFirstName: user.searchFirstName,
-    searchLastName: user.searchLastName,
-    searchFullName: user.searchFullName,
-    searchEmail: user.searchEmail,
-    keywords: user.keywords,
-    createdAt: user.createdAt.toISOString(),
-    updatedAt: user.updatedAt.toISOString(),
-  }
-}
 
 async function queryUsersByPrefixField(
   field:
@@ -75,7 +39,7 @@ async function queryUsersByPrefixField(
     orderBy: { [field]: "asc" },
   })
 
-  return Promise.all(users.map(mapUser))
+  return Promise.all(users.map(mapUserToClient))
 }
 
 /**

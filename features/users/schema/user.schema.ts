@@ -10,7 +10,6 @@ export const UserSearchFieldsSchema = z.object({
   searchLastName: z.string(),
   searchFullName: z.string(),
   searchEmail: z.string(),
-  keywords: z.array(z.string()).default([]),
 })
 
 export const UserSchema = z.object({
@@ -40,7 +39,6 @@ export const UserClientWritableOmit = {
   searchLastName: true,
   searchFullName: true,
   searchEmail: true,
-  keywords: true,
 } as const
 
 /** Editable profile fields on the account page (no email, roles, or password). */

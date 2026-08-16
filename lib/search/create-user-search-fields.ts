@@ -4,7 +4,6 @@ export type UserSearchInput = {
   firstName: string
   lastName: string
   email: string
-  roles: string[]
 }
 
 export function createUserSearchFields(data: UserSearchInput): UserSearchFields {
@@ -18,14 +17,5 @@ export function createUserSearchFields(data: UserSearchInput): UserSearchFields 
     searchLastName: last,
     searchFullName: fullName,
     searchEmail: email,
-    keywords: [
-      ...new Set([
-        first,
-        last,
-        fullName,
-        email,
-        ...data.roles.map((role) => role.toLowerCase()),
-      ]),
-    ].filter(Boolean),
   }
 }
