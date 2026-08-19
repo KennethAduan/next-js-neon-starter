@@ -44,7 +44,7 @@ async function uploadPendingFile(
 ): Promise<string> {
   const ext = pendingFile.name.split(".").pop() ?? "jpg"
   return uploadFile(pendingFile, `users/${uid}/profile-${Date.now()}.${ext}`, {
-    contentType: pendingFile.type,
+    compression: "avatar",
   })
 }
 

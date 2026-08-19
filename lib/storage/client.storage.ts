@@ -1,9 +1,18 @@
 "use client"
 
+import { compressImageForUpload } from "@/lib/storage/compress-image.client"
+import type {
+  ImageCompressionOptions,
+  ImageCompressionPreset,
+} from "@/lib/storage/compress-image.client"
 import { createUploadIntentAction } from "@/lib/storage/upload.action"
 
 type UploadOptions = {
   contentType?: string
+  /** Default true. Set false to upload the raw File (for example GIF). */
+  compress?: boolean
+  /** Preset name or custom overrides. Default: `avatar`. */
+  compression?: ImageCompressionPreset | ImageCompressionOptions
 }
 
 /**
@@ -15,8 +24,14 @@ export async function uploadFile(
   _legacyPath: string,
   options?: UploadOptions
 ): Promise<string> {
-  const contentType = options?.contentType || file.type || "application/octet-stream"
-  const extension = file.name.split(".").pop() ?? "bin"
+  const shouldCompress = options?.compress !== false
+  const preparedFile = shouldCompress
+    ? await compressImageForUpload(file, options?.compression)
+    : file
+
+  const contentType =
+    options?.contentType || preparedFile.type || "application/octet-stream"
+  const extension = preparedFile.name.split(".").pop() ?? "bin"
 
   const result = await createUploadIntentAction({
     contentType: contentType as
@@ -24,7 +39,7 @@ export async function uploadFile(
       | "image/png"
       | "image/webp"
       | "image/gif",
-    contentLength: file.size,
+    contentLength: preparedFile.size,
     folder: "users",
     extension,
   })
@@ -36,7 +51,7 @@ export async function uploadFile(
   const { uploadUrl, key } = result.data
   const response = await fetch(uploadUrl, {
     method: "PUT",
-    body: file,
+    body: preparedFile,
     headers: {
       "Content-Type": contentType,
     },

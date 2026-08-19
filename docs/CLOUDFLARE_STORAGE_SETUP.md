@@ -20,8 +20,11 @@ Relevant code:
 
 - `lib/storage/r2.server.ts` — S3 client, presign upload/download
 - `lib/storage/upload.action.ts` — authenticated upload-intent action
-- `lib/storage/client.storage.ts` — client PUT after intent
+- `lib/storage/client.storage.ts` — compress, then client PUT after intent
+- `lib/storage/compress-image.client.ts` — browser resize and re-encode
 - `lib/storage/object-path.ts` — key normalization helpers
+
+Image compression defaults and tuning: `docs/IMAGE_COMPRESSION.md`.
 
 ## 1. Create an R2 bucket
 
@@ -142,9 +145,10 @@ separate bucket or key prefix for Preview.
 
 Defined in `lib/storage/upload.action.ts`:
 
-- Max size: 5 MB
+- Max size: 5 MB (after client compression; see `docs/IMAGE_COMPRESSION.md`)
 - Allowed types: `image/jpeg`, `image/png`, `image/webp`, `image/gif`
 - Object key prefix: `users/{authenticatedUserId}/…`
+- Default upload path compresses JPEG/PNG/WebP to WebP before PUT
 
 Change those limits in code when product needs differ. Keep validation on the
 server before signing.

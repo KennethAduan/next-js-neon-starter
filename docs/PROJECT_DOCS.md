@@ -12,7 +12,8 @@ Next.js starter for apps on Neon PostgreSQL, Better Auth, Prisma, and Cloudflare
 - Auth: Better Auth email/password. Sessions via Better Auth cookies.
 - Data: Prisma models in `prisma/schema.prisma` against Neon.
 - Files: Cloudflare R2 via S3-compatible SDK and short-lived presigned uploads.
-  Setup: `docs/CLOUDFLARE_STORAGE_SETUP.md`.
+  Setup: `docs/CLOUDFLARE_STORAGE_SETUP.md`. Compression:
+  `docs/IMAGE_COMPRESSION.md`.
 
 ## Local bootstrap
 
