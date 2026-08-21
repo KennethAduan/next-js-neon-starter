@@ -18,11 +18,11 @@ disabled. Signed URLs are the supported read path.
 
 Relevant code:
 
-- `lib/storage/r2.server.ts` — S3 client, presign upload/download
-- `lib/storage/upload.action.ts` — authenticated upload-intent action
-- `lib/storage/client.storage.ts` — compress, then client PUT after intent
-- `lib/storage/compress-image.client.ts` — browser resize and re-encode
-- `lib/storage/object-path.ts` — key normalization helpers
+- `lib/storage/r2.server.ts` - S3 client, presign upload/download
+- `lib/storage/upload.action.ts` - authenticated upload-intent action
+- `lib/storage/client.storage.ts` - compress, then client PUT after intent
+- `lib/storage/compress-image.client.ts` - browser resize and re-encode
+- `lib/storage/object-path.ts` - key normalization helpers
 
 Image compression defaults and tuning: `docs/IMAGE_COMPRESSION.md`.
 

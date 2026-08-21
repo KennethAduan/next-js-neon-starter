@@ -42,7 +42,7 @@ copying numbers across forms.
 | `productCard` | 800 | 0.80 | WebP | Grid cards, category tiles, cart thumb |
 | `productGallery` | 2048 | 0.85 | WebP | PDP gallery, zoom-friendly product image |
 | `cmsHero` | 2560 | 0.88 | WebP | Hero banners, landing sections |
-| `cmsMaster` | — | — | — | Skip client compress; upload original |
+| `cmsMaster` | - | - | - | Skip client compress; upload original |
 
 `cmsMaster` sets `skipCompression: true`. Use it when the CMS stores a full
 master file and a background worker (Sharp, queue job) creates thumbnails and
@@ -76,7 +76,7 @@ should plan for layers 2 and 3 before launch:
 | CMS media library | `cmsMaster` | Required multi-size derivatives |
 
 Raise `MAX_UPLOAD_BYTES` in `lib/storage/upload.action.ts` when you add
-`cmsMaster` uploads. The starter cap is 5 MB. CMS masters often need 10–20 MB.
+`cmsMaster` uploads. The starter cap is 5 MB. CMS masters often need 10-20 MB.
 
 ### When to add an external library
 
@@ -196,7 +196,7 @@ Do not sign first and compress second.
 ## Verify locally
 
 1. Run `bun dev` and sign in.
-2. Open **Account** and upload a large phone photo (often 3–8 MB).
+2. Open **Account** and upload a large phone photo (often 3-8 MB).
 3. In DevTools **Network**:
    - Confirm `createUploadIntent` `contentLength` is smaller than the
      original file.

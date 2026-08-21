@@ -5,6 +5,7 @@ const TEST_UI_ROUTES = {
 }
 
 const HIDDEN_ROUTES = {
+  DOCS: "/docs",
   REGISTER_ADMIN: "/register-admin",
 }
 
@@ -39,12 +40,12 @@ export const ROUTES = {
   CONTRACTS: SIDEBAR_ROUTES.CONTRACTS,
   REPORTS: SIDEBAR_ROUTES.REPORTS,
   TEST_UI: TEST_UI_ROUTES.ROOT,
+  DOCS: HIDDEN_ROUTES.DOCS,
   REGISTER_ADMIN: HIDDEN_ROUTES.REGISTER_ADMIN,
 }
 
 /** Routes under `app/(protected)` — require a valid session in proxy/layout. */
 export const PROTECTED_ROUTES = [
-  ROUTES.HOME,
   ROUTES.CLIENTS,
   ROUTES.INVESTMENTS,
   ROUTES.ACCOUNT,

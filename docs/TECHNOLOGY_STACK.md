@@ -12,7 +12,7 @@ duplicate this operational detail.
 
 ## Locked Stack
 
-- Framework: Next.js `16.2.6`
+- Framework: Next.js `16.3.1`
 - Runtime and package manager: Bun
 - Hosting: Vercel
 - Database: Neon PostgreSQL
@@ -20,6 +20,7 @@ duplicate this operational detail.
 - Authentication: Better Auth
 - Object storage: Cloudflare R2
 - Validation: Zod
+- Client UI state: Jotai
 - Language: TypeScript
 
 Do not replace these choices without an explicit project decision.
@@ -28,8 +29,177 @@ Do not replace these choices without an explicit project decision.
 
 Before changing a Next.js API, routing convention, caching behavior, or file
 structure, read the relevant local guide under `node_modules/next/dist/docs/`.
-Next.js `16.2.6` has breaking changes from older releases. Follow its current
+Next.js `16.3.1` has breaking changes from older releases. Follow its current
 guidance and deprecation notices, not remembered patterns or web snippets.
+
+## Junior Developer Primer
+
+### What is Next.js?
+
+Next.js is the full-stack React framework used by this template. It provides
+file-based routes, server rendering, server-only code boundaries, and API
+endpoints in the same codebase. React is still the UI library. Next.js adds the
+application runtime and conventions around it.
+
+| Concern | React SPA only | This Next.js template |
+| --- | --- | --- |
+| Route definition | Client router configuration | Files under `app/` |
+| First render | Usually browser JavaScript | Server Components by default |
+| Secrets and database access | Needs a separate backend boundary | Server Components, Server Actions, and Route Handlers |
+| Browser interaction | React client component | Add `"use client"` to the small interactive boundary |
+| HTTP endpoint | Separate backend or service | `app/api/**/route.ts` Route Handler |
+
+### Choose the right Next.js tool
+
+| Use this | When it fits | Do not use it for |
+| --- | --- | --- |
+| Server Component | Reading data and rendering a page | Click handlers, `useState`, or browser APIs |
+| Client Component | Forms, events, local state, browser APIs | Prisma, secrets, or direct authorization decisions |
+| Server Action | A mutation started by this app's UI | Webhooks, mobile clients, or public HTTP contracts |
+| Route Handler | Webhooks, third parties, mobile, or a public API | Internal form mutations by default |
+| Jotai atom | Shared temporary browser UI state | Database records or server cache |
+
+### Server Component first
+
+Pages and layouts are Server Components unless a file starts with `"use client"`.
+Keep database reads and secret-dependent work here. Pass only plain,
+serializable data to an interactive child.
+
+```tsx
+// features/clients/pages/ClientsPage.tsx
+import { prisma } from "@/lib/prisma"
+import { ClientTable } from "@/features/clients/components/ClientTable"
+
+export async function ClientsPage() {
+  const clients = await prisma.client.findMany({
+    select: { id: true, fullName: true, email: true },
+    orderBy: { fullName: "asc" },
+  })
+
+  return <ClientTable clients={clients} />
+}
+```
+
+### Add `"use client"` only at the interactive edge
+
+Use a Client Component for event handlers, React state, effects, or browser
+APIs. The directive makes the file and its imports part of the browser bundle,
+so keep this boundary as small as practical.
+
+```tsx
+"use client"
+
+import { useState } from "react"
+
+export function ClientSearch() {
+  const [query, setQuery] = useState("")
+
+  return (
+    <input
+      aria-label="Search clients"
+      onChange={(event) => setQuery(event.target.value)}
+      value={query}
+    />
+  )
+}
+```
+
+### Server Action versus Route Handler
+
+Both run on the server. The caller decides the choice.
+
+| | Server Action | Route Handler |
+| --- | --- | --- |
+| Called by | This app's React UI | Any HTTP client |
+| Best for | Authenticated form or button mutation | Webhook, integration, mobile, or public API |
+| Location | `features/<feature>/actions/` | `app/api/<endpoint>/route.ts` |
+| Input | Typed action input plus server validation | `Request` body, query, or headers plus server validation |
+
+```ts
+// features/clients/actions/create-client.action.ts
+"use server"
+
+import { authActionClient } from "@/lib/safe.action"
+import { prisma } from "@/lib/prisma"
+import { z } from "zod"
+
+const CreateClientSchema = z.object({
+  fullName: z.string().trim().min(1).max(120),
+})
+
+export const createClientAction = authActionClient
+  .inputSchema(CreateClientSchema)
+  .action(async ({ parsedInput }) => {
+    const client = await prisma.client.create({ data: parsedInput })
+    return { id: client.id }
+  })
+```
+
+```ts
+// app/api/integrations/provider/route.ts
+import { z } from "zod"
+
+const WebhookSchema = z.object({ event: z.string().min(1) })
+
+export async function POST(request: Request) {
+  const payload = WebhookSchema.safeParse(await request.json())
+
+  if (!payload.success) {
+    return Response.json({ error: "Invalid payload" }, { status: 400 })
+  }
+
+  // Verify the provider signature before trusting the webhook payload.
+  return Response.json({ received: true })
+}
+```
+
+### Shared browser state with Jotai
+
+Jotai is for UI state that more than one Client Component needs, such as a
+dialog, temporary filter, or draft workflow. It is not the source of truth for
+Prisma data.
+
+```ts
+// features/clients/atom/client-filter.atom.ts
+import { atom } from "jotai"
+
+export const clientFilterAtom = atom("")
+```
+
+```tsx
+"use client"
+
+import { useAtom } from "jotai"
+import { clientFilterAtom } from "@/features/clients/atom/client-filter.atom"
+
+export function ClientFilter() {
+  const [filter, setFilter] = useAtom(clientFilterAtom)
+
+  return <input onChange={(event) => setFilter(event.target.value)} value={filter} />
+}
+```
+
+### Prisma compared with raw SQL
+
+| Prisma | Raw SQL |
+| --- | --- |
+| Typed queries generated from `prisma/schema.prisma` | Direct SQL string or query builder |
+| Default for application reads and writes in this template | Use only when Prisma cannot express a measured need |
+| Migrations and schema history stay together | Still review query plans and migrations |
+
+Use Prisma for normal feature work. Add an index only after identifying a real
+query path and reviewing its query plan.
+
+### Runnable examples in this repository
+
+Open [/test-ui](/test-ui) during KT. It safely demonstrates:
+
+- a `"use server"` action in `app/(hidden)/test-ui/_actions/stack-playground.action.ts`
+- a Route Handler in `app/api/test-ui/route.ts`
+- a `"use client"` component and Jotai atom in `app/(hidden)/test-ui/_components/stack-playground.tsx`
+
+Read the source alongside the working page. Production features must still add
+authorization and resource permission checks before every private read or write.
 
 ## Project Shape
 
@@ -57,6 +227,148 @@ features/
 - Server components, route handlers, server actions, Prisma, Better Auth, and
   R2 credentials remain server-side. Client code gets only intentionally public
   `NEXT_PUBLIC_*` values.
+
+## KT Reference: Protected Feature Mutation
+
+Use this as junior-developer reference when adding product behavior. Example
+creates a `Client` record. Copy shape, then rename feature, schema, permission,
+and Prisma model for product need.
+
+Runnable companion: `/test-ui` has safe internal examples for `"use server"`,
+Route Handlers, `"use client"`, and Jotai. Use it for KT; use this document for
+production rules and architecture.
+
+### 1. Put code with owning feature
+
+```text
+features/clients/
+  actions/create-client.action.ts
+  schema/clients.schema.ts
+  pages/ClientsPage.tsx
+  clients.docs.md
+```
+
+Do not put feature queries or actions in `app/` or a generic `lib/` folder.
+`lib/` is only for cross-feature infrastructure such as `lib/prisma.ts` and
+`lib/safe.action.ts`.
+
+### 2. Validate, authorize, then mutate on server
+
+`features/clients/actions/create-client.action.ts`
+
+```ts
+"use server"
+
+import { authActionClient } from "@/lib/safe.action"
+import { prisma } from "@/lib/prisma"
+import { z } from "zod"
+
+const CreateClientSchema = z.object({
+  fullName: z.string().trim().min(1).max(120),
+  email: z.email().optional(),
+  phone: z.string().trim().max(30).optional(),
+})
+
+export const createClientAction = authActionClient
+  .metadata({ actionName: "createClient" })
+  .inputSchema(CreateClientSchema)
+  .action(async ({ parsedInput }) => {
+    // authActionClient already requires a valid Better Auth session.
+    // Add role, organization, or ownership checks here before this mutation.
+    const client = await prisma.client.create({
+      data: {
+        fullName: parsedInput.fullName,
+        email: parsedInput.email,
+        phone: parsedInput.phone,
+        searchFullName: parsedInput.fullName.toLowerCase(),
+        searchEmail: parsedInput.email?.toLowerCase(),
+        searchPhone: parsedInput.phone?.toLowerCase(),
+      },
+    })
+
+    return { success: true as const, clientId: client.id }
+  })
+```
+
+`"use server"` keeps Prisma and Better Auth session checks server-side.
+`authActionClient` gets session through action `ctx`; do not accept a user id
+from browser input as authorization proof. Add `ctx` to action callback for
+ownership or organization checks when model needs them.
+
+### 3. Call action from client UI
+
+```tsx
+"use client"
+
+import { useAction } from "next-safe-action/hooks"
+import { createClientAction } from "@/features/clients/actions/create-client.action"
+
+export function CreateClientButton() {
+  const { executeAsync, isExecuting } = useAction(createClientAction)
+
+  async function createClient() {
+    const result = await executeAsync({
+      fullName: "Ada Lovelace",
+      email: "ada@example.com",
+    })
+
+    if (result.data?.success) {
+      // Refresh local data, close dialog, or navigate.
+      console.log(result.data.clientId)
+    }
+  }
+
+  return (
+    <button disabled={isExecuting} onClick={createClient} type="button">
+      {isExecuting ? "Creating..." : "Create client"}
+    </button>
+  )
+}
+```
+
+Production form values come from existing form state, never hard-coded values.
+Handle `result.serverError` and validation errors in component UI. Keep client
+validation for UX; server Zod validation remains source of truth.
+
+### 4. Upload private image, store key only
+
+Use current R2 helper in client component after user selects a `File`:
+
+```ts
+import { uploadFile } from "@/lib/storage/client.storage"
+import { updateAccountProfileAction } from "@/features/auth/actions/account.action"
+
+const objectKey = await uploadFile(file, "unused-legacy-path", {
+  compression: "avatar",
+})
+
+await updateAccountProfileAction({
+  firstName: "Ada",
+  lastName: "Lovelace",
+  phoneNumber: "",
+  photoURL: objectKey,
+})
+```
+
+`uploadFile` asks authenticated server action for short-lived, user-scoped R2
+upload URL, then browser `PUT`s file directly to R2. Persist returned
+`objectKey` in Prisma. Never persist `uploadUrl`, signed download URL, or R2
+credentials. Current helper owns R2 folder/key generation; second argument is a
+legacy compatibility placeholder and does not control destination.
+
+### Feature Checklist
+
+1. Create feature folder and feature documentation.
+2. Define Zod input schema beside feature.
+3. Use `authActionClient` for protected actions; add resource permission check.
+4. Read/write through Prisma in action or feature `server/` code.
+5. Return minimal plain data. Never return secrets, passwords, signed URLs, or
+   internal authorization data.
+6. For files: upload through R2 intent, store key, authorize every download.
+7. Add schema migration when Prisma model changes: `bun run db:generate`, then
+   `bun run db:migrate` against non-production database first.
+8. Run required checks before merge: `bun run lint`, `bun run typecheck`,
+   `bun run doctor`, and `bun run fallow`.
 
 ## Local Setup
 
@@ -206,7 +518,7 @@ them for a launch budget.
   operations, and 10M Class B operations per month; R2 egress is free. An R2
   subscription/billing setup is still required even when usage stays included.
 - Better Auth is an application library. Its costs are the selected email,
-  OAuth, database, and hosting services—not a Better Auth hosted-plan fee.
+  OAuth, database, and hosting services, not a Better Auth hosted-plan fee.
 
 Track usage from day one. Alert before limits, cap upload sizes, cache public
   assets, expire unused Neon branches, and delete abandoned R2 uploads. Upgrade
