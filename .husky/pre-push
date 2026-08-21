@@ -2,11 +2,22 @@
 set -e
 
 zero="0000000000000000000000000000000000000000"
+repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root"
+
+require_local_tool() {
+  tool_path="node_modules/.bin/$1"
+
+  if [ ! -x "$tool_path" ]; then
+    printf '%s\n' "Missing local $1. Run bun install."
+    exit 1
+  fi
+}
 
 run_changed_checks() {
   base="$1"
-  bunx react-doctor --diff "$base" --no-score
-  bunx fallow audit --summary --changed-since "$base"
+  ./node_modules/.bin/react-doctor --verbose --scope changed --base "$base" --no-score
+  ./node_modules/.bin/fallow audit --summary --changed-since "$base"
 }
 
 default_base_branch() {
@@ -30,6 +41,9 @@ resolve_push_base() {
 
   printf '%s\n' "$remote_sha"
 }
+
+require_local_tool react-doctor
+require_local_tool fallow
 
 ran=0
 while read -r local_ref local_sha remote_ref remote_sha; do

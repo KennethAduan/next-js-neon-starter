@@ -1,18 +1,67 @@
-"use client"
+"use client";
 
-import { compressImageForUpload } from "@/lib/storage/compress-image.client"
+import { compressImageForUpload } from "@/lib/storage/compress-image.client";
 import type {
   ImageCompressionOptions,
   ImageCompressionPreset,
-} from "@/lib/storage/compress-image.client"
-import { createUploadIntentAction } from "@/lib/storage/upload.action"
+} from "@/lib/storage/compress-image.client";
+import { createUploadIntentAction } from "@/lib/storage/upload.action";
 
 type UploadOptions = {
-  contentType?: string
+  contentType?: string;
   /** Default true. Set false to upload the raw File (for example GIF). */
-  compress?: boolean
+  compress?: boolean;
   /** Preset name or custom overrides. Default: `avatar`. */
-  compression?: ImageCompressionPreset | ImageCompressionOptions
+  compression?: ImageCompressionPreset | ImageCompressionOptions;
+};
+
+async function prepareUploadFile(
+  file: File,
+  options?: UploadOptions,
+): Promise<File> {
+  if (options?.compress === false) return file;
+
+  return compressImageForUpload(file, options?.compression);
+}
+
+function getContentType(file: File, options?: UploadOptions): string {
+  return options?.contentType || file.type || "application/octet-stream";
+}
+
+function getFileExtension(file: File): string {
+  return file.name.split(".").pop() ?? "bin";
+}
+
+async function requestUploadIntent(file: File, contentType: string) {
+  const result = await createUploadIntentAction({
+    contentType: contentType as
+      "image/jpeg" | "image/png" | "image/webp" | "image/gif",
+    contentLength: file.size,
+    folder: "users",
+    extension: getFileExtension(file),
+  });
+
+  if (!result?.data?.success) {
+    throw new Error(result?.serverError ?? "Failed to create upload intent");
+  }
+
+  return result.data;
+}
+
+async function uploadToPresignedUrl(
+  uploadUrl: string,
+  file: File,
+  contentType: string,
+) {
+  const response = await fetch(uploadUrl, {
+    method: "PUT",
+    body: file,
+    headers: { "Content-Type": contentType },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Upload failed with status ${response.status}`);
+  }
 }
 
 /**
@@ -22,44 +71,15 @@ type UploadOptions = {
 export async function uploadFile(
   file: File,
   _legacyPath: string,
-  options?: UploadOptions
+  options?: UploadOptions,
 ): Promise<string> {
-  const shouldCompress = options?.compress !== false
-  const preparedFile = shouldCompress
-    ? await compressImageForUpload(file, options?.compression)
-    : file
+  const preparedFile = await prepareUploadFile(file, options);
+  const contentType = getContentType(preparedFile, options);
+  const { uploadUrl, key } = await requestUploadIntent(
+    preparedFile,
+    contentType,
+  );
+  await uploadToPresignedUrl(uploadUrl, preparedFile, contentType);
 
-  const contentType =
-    options?.contentType || preparedFile.type || "application/octet-stream"
-  const extension = preparedFile.name.split(".").pop() ?? "bin"
-
-  const result = await createUploadIntentAction({
-    contentType: contentType as
-      | "image/jpeg"
-      | "image/png"
-      | "image/webp"
-      | "image/gif",
-    contentLength: preparedFile.size,
-    folder: "users",
-    extension,
-  })
-
-  if (!result?.data?.success) {
-    throw new Error(result?.serverError ?? "Failed to create upload intent")
-  }
-
-  const { uploadUrl, key } = result.data
-  const response = await fetch(uploadUrl, {
-    method: "PUT",
-    body: preparedFile,
-    headers: {
-      "Content-Type": contentType,
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`Upload failed with status ${response.status}`)
-  }
-
-  return key
+  return key;
 }
