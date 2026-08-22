@@ -6,7 +6,7 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "production", "test"]),
     APP_URL: z.string().min(1),
     DATABASE_URL: z.string().min(1),
-    DIRECT_URL: z.string().min(1).optional(),
+
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.string().min(1),
     UNLOCK_PASSCODE: z.string().min(1),
@@ -27,7 +27,6 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     APP_URL: process.env.APP_URL,
     DATABASE_URL: process.env.DATABASE_URL,
-    DIRECT_URL: process.env.DIRECT_URL,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
     UNLOCK_PASSCODE: process.env.UNLOCK_PASSCODE,

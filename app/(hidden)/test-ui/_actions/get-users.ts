@@ -1,6 +1,5 @@
 "use server"
 
-import { getServerSession } from "@/features/auth/server/session.server"
 import type { ExtendedColumnFilter, JoinOperator } from "@/types/data-table"
 import { MOCK_USERS, type User } from "../_mock/users"
 
@@ -240,10 +239,8 @@ function sortUsers(users: User[], sort: string | null): User[] {
 }
 
 export async function getUsers(params: GetUsersParams): Promise<GetUsersResult> {
-  const session = await getServerSession()
-  if (!session?.user.id) {
-    throw new Error("Unauthorized")
-  }
+  // Public demo data, deliberately not auth-gated: this page teaches the
+  // React Query pattern, not authorization. See /test-ui/auth for that.
 
   // Simulate network latency
   await new Promise((resolve) => setTimeout(resolve, 400))

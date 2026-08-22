@@ -21,6 +21,7 @@ duplicate this operational detail.
 - Object storage: Cloudflare R2
 - Validation: Zod
 - Client UI state: Jotai
+- UI components: shadcn/ui (`base-nova` style, Tabler icons)
 - Language: TypeScript
 
 Do not replace these choices without an explicit project decision.
@@ -32,7 +33,6 @@ structure, read the relevant local guide under `node_modules/next/dist/docs/`.
 Next.js `16.3.1` has breaking changes from older releases. Follow its current
 guidance and deprecation notices, not remembered patterns or web snippets.
 
-## Junior Developer Primer
 
 ### What is Next.js?
 
@@ -179,6 +179,39 @@ export function ClientFilter() {
 }
 ```
 
+### UI components (shadcn/ui)
+
+Base UI primitives live in `components/ui/` (`Button`, `Card`, `Input`,
+`Tabs`, `Attachment`, and so on). They come from shadcn/ui, configured in
+`components.json`:
+
+- Style: `base-nova`, base color `neutral`, CSS variables enabled.
+- Icon library: Tabler (`@tabler/icons-react`). Use this for every icon; do
+  not add a second icon library.
+- Aliases: `@/components`, `@/components/ui`, `@/lib`, `@/hooks`.
+
+Add a new primitive with the shadcn CLI, not by hand-writing one:
+
+```bash
+bunx shadcn@latest add <component-name>
+```
+
+This writes into `components/ui/` following the same config. Before adding a
+component that looks similar to an existing one, check `components/ui/`
+first. Most common needs (buttons, cards, form fields, dialogs, tables) are
+already there.
+
+Components in `components/ui/` are already customized for this project's
+visual language (radius, ring-based elevation instead of borders on `Card`,
+the `font-heading` token, and so on). Read an existing component in that
+folder before styling a new one, so new UI stays visually consistent instead
+of reverting to shadcn's untouched defaults.
+
+Keep feature-specific composition (a component that combines several `ui/`
+primitives for one feature's need) inside that feature's
+`components/` folder, not in `components/ui/`. `components/ui/` stays
+generic and reusable across features.
+
 ### Prisma compared with raw SQL
 
 | Prisma | Raw SQL |
@@ -192,11 +225,22 @@ query path and reviewing its query plan.
 
 ### Runnable examples in this repository
 
-Open [/test-ui](/test-ui) during KT. It safely demonstrates:
+Open [/test-ui](/test-ui) during KT. Each pattern below has its own page: a
+live demo paired with the real, current source code read straight off disk.
 
-- a `"use server"` action in `app/(hidden)/test-ui/_actions/stack-playground.action.ts`
-- a Route Handler in `app/api/test-ui/route.ts`
-- a `"use client"` component and Jotai atom in `app/(hidden)/test-ui/_components/stack-playground.tsx`
+- [/test-ui/server-components](/test-ui/server-components): Server Component
+  reading Prisma directly
+- [/test-ui/server-actions](/test-ui/server-actions): `"use server"` action in
+  `app/(hidden)/test-ui/_actions/stack-playground.action.ts`
+- [/test-ui/route-handlers](/test-ui/route-handlers): Route Handler in
+  `app/api/test-ui/route.ts`
+- [/test-ui/client-state](/test-ui/client-state): `"use client"` component and
+  Jotai atom
+- [/test-ui/react-query](/test-ui/react-query): a Server Action used as a
+  React Query `queryFn` from a Client Component
+- [/test-ui/auth](/test-ui/auth): `getServerSession()` and the
+  `authActionClient` middleware that rejects unauthenticated calls
+- [/test-ui/file-upload](/test-ui/file-upload): R2 presigned upload flow
 
 Read the source alongside the working page. Production features must still add
 authorization and resource permission checks before every private read or write.
@@ -235,7 +279,8 @@ creates a `Client` record. Copy shape, then rename feature, schema, permission,
 and Prisma model for product need.
 
 Runnable companion: `/test-ui` has safe internal examples for `"use server"`,
-Route Handlers, `"use client"`, and Jotai. Use it for KT; use this document for
+Route Handlers, `"use client"` and Jotai, Server Components, React Query,
+Better Auth, and R2 file upload. Use it for KT; use this document for
 production rules and architecture.
 
 ### 1. Put code with owning feature
@@ -391,10 +436,7 @@ provider connection strings.
 ```dotenv
 # Neon / Prisma
 # Use Neon's pooled URL for normal application requests.
-DATABASE_URL="postgresql://USER:PASSWORD@HOST/DB?sslmode=require"
-# Use an unpooled/direct URL only when the installed Prisma version or migration
-# tooling requires a dedicated migration connection.
-DIRECT_URL="postgresql://USER:PASSWORD@HOST/DB?sslmode=require"
+DATABASE_URL="postgresql://USER:PASSWORD@HOST/DB?sslmode=verify-full"
 
 # Better Auth
 BETTER_AUTH_SECRET="generate-a-long-random-secret"
