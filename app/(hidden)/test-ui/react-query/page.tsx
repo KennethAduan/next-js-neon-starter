@@ -25,13 +25,13 @@ export default async function ReactQueryPatternPage() {
     <div>
       <PatternHeader
         avoidWhen={["Data only the initial page render needs"]}
-        badge="use client + React Query"
-        description="A fourth server-boundary shape: a Server Action (get-users.ts) called directly as a React Query queryFn from a Client Component. React Query owns caching, pagination state, and refetch. The Server Action stays the only place that touches data."
+        badge="use client + React Query + nuqs"
+        description="A fourth server-boundary shape: a Server Action (get-users.ts) called directly as a React Query queryFn from a Client Component. nuqs owns page, sort, and filter state in the URL; React Query reads that state and owns caching, deduping, and refetch around the call. The Server Action stays the only place that touches data."
         icon={<IconRefresh className="size-5" />}
-        title="React Query"
+        title="React Query + nuqs"
         useWhen={[
           "Client needs refetch, pagination, or cache (search, sort, live filter)",
-          "URL-synced table/list state",
+          "Table/list state that should survive refresh or be shareable as a link",
         ]}
       />
       <Tabs defaultValue="simple">

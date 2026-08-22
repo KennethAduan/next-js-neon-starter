@@ -50,9 +50,9 @@ const PATTERNS = [
   {
     href: "/test-ui/react-query",
     icon: IconRefresh,
-    title: "React Query",
+    title: "React Query + nuqs",
     badge: "client-side fetch",
-    description: "A Server Action used as a queryFn. Client owns caching, paging, and refetch.",
+    description: "A Server Action used as a queryFn. nuqs syncs page/sort/filter state to the URL.",
   },
   {
     href: "/test-ui/auth",

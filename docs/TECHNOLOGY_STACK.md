@@ -21,6 +21,7 @@ duplicate this operational detail.
 - Object storage: Cloudflare R2
 - Validation: Zod
 - Client UI state: Jotai
+- URL state: nuqs
 - UI components: shadcn/ui (`base-nova` style, Tabler icons)
 - Language: TypeScript
 
@@ -178,6 +179,35 @@ export function ClientFilter() {
   return <input onChange={(event) => setFilter(event.target.value)} value={filter} />
 }
 ```
+
+### URL-synced state with nuqs
+
+Use nuqs instead of Jotai when the state should survive a refresh, work with
+the back button, or be shareable as a link: pagination, sort, filters, and
+search queries on a list or table. Jotai state disappears on reload; nuqs
+state lives in the URL's query string. `NuqsAdapter` is already mounted once
+in `providers/AppProviders.tsx`, do not add a second one.
+
+```tsx
+"use client"
+
+import { parseAsInteger, useQueryState } from "nuqs"
+
+export function ClientsPagination() {
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
+
+  return (
+    <button onClick={() => setPage(page + 1)} type="button">
+      Page {page}
+    </button>
+  )
+}
+```
+
+See `hooks/use-data-table.ts` and
+`app/(hidden)/test-ui/_components/users-data-table.tsx` for a full
+pagination, sort, and filter example wired through nuqs and read server-side
+by a Server Action.
 
 ### UI components (shadcn/ui)
 
