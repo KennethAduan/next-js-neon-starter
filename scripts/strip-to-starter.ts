@@ -8,7 +8,7 @@
  */
 
 import { existsSync } from "node:fs"
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises"
+import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -26,7 +26,12 @@ const PATHS_TO_DELETE = [
   "lib/search/create-client-search-fields.ts",
   "app/page.tsx",
   "app/typeset.css",
+  "app/testing-1",
+  "app/react-query",
+  "app/api/get-data",
 ]
+
+const PRUNE_ROOTS = ["app", "features"] as const
 
 const MIGRATION_DIR = "prisma/migrations/20260901100000_drop_client"
 const MIGRATION_SQL = `-- DropTable
@@ -309,6 +314,63 @@ async function deletePath(targetPath: string): Promise<void> {
   console.log(`  deleted: ${targetPath}`)
 }
 
+async function collectEmptyDirectories(targetDir: string): Promise<string[]> {
+  const absoluteDir = path.join(ROOT, targetDir)
+  if (!existsSync(absoluteDir)) {
+    return []
+  }
+
+  const emptyDirs: string[] = []
+
+  async function walk(dir: string): Promise<void> {
+    const items = await readdir(dir, { withFileTypes: true })
+
+    for (const item of items) {
+      if (!item.isDirectory()) {
+        continue
+      }
+
+      const fullPath = path.join(dir, item.name)
+      await walk(fullPath)
+
+      const children = await readdir(fullPath)
+      if (children.length === 0) {
+        emptyDirs.push(rel(fullPath))
+      }
+    }
+  }
+
+  await walk(absoluteDir)
+
+  const rootChildren = await readdir(absoluteDir)
+  if (rootChildren.length === 0) {
+    emptyDirs.push(targetDir)
+  }
+
+  return emptyDirs.sort()
+}
+
+async function pruneEmptyDirectories(targetDirs: readonly string[]): Promise<void> {
+  for (const targetDir of targetDirs) {
+    const emptyDirs = await collectEmptyDirectories(targetDir)
+
+    for (const emptyDir of emptyDirs.sort(
+      (left, right) => right.split(path.sep).length - left.split(path.sep).length
+    )) {
+      const absolutePath = path.join(ROOT, emptyDir)
+      if (!existsSync(absolutePath)) {
+        continue
+      }
+
+      const children = await readdir(absolutePath)
+      if (children.length === 0) {
+        await rm(absolutePath, { recursive: true, force: true })
+        console.log(`  pruned empty: ${emptyDir}`)
+      }
+    }
+  }
+}
+
 async function patchFile(relativePath: string, content: string): Promise<void> {
   const absolutePath = path.join(ROOT, relativePath)
   await mkdir(path.dirname(absolutePath), { recursive: true })
@@ -371,12 +433,24 @@ async function writeMigration(): Promise<void> {
   console.log(`  wrote: ${rel(migrationPath)}`)
 }
 
-function printPlan(): void {
+function printPlan(emptyDirs: string[]): void {
   console.log(APPLY ? "Applying strip-to-starter..." : "Dry run — strip-to-starter plan:")
   console.log("")
   console.log("Delete:")
   for (const target of PATHS_TO_DELETE) {
     console.log(`  - ${target}`)
+  }
+  console.log("")
+  console.log("Prune empty directories under:")
+  for (const target of PRUNE_ROOTS) {
+    console.log(`  - ${target}/`)
+  }
+  if (emptyDirs.length > 0) {
+    console.log("")
+    console.log("Empty directories found now:")
+    for (const emptyDir of emptyDirs) {
+      console.log(`  - ${emptyDir}`)
+    }
   }
   console.log("")
   console.log("Write / patch:")
@@ -411,6 +485,10 @@ async function apply(): Promise<void> {
   }
 
   console.log("")
+  console.log("Pruning empty directories...")
+  await pruneEmptyDirectories(PRUNE_ROOTS)
+
+  console.log("")
   console.log("Writing patched files...")
   for (const [filePath, content] of Object.entries(FILE_PATCHES)) {
     await patchFile(filePath, content)
@@ -435,7 +513,11 @@ async function main(): Promise<void> {
     process.exit(1)
   }
 
-  printPlan()
+  const emptyDirs = (
+    await Promise.all(PRUNE_ROOTS.map((target) => collectEmptyDirectories(target)))
+  ).flat()
+
+  printPlan(emptyDirs)
 
   if (!APPLY) {
     return
