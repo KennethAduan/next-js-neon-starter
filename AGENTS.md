@@ -32,6 +32,18 @@ This project uses feature-based architecture.
   - `utils/` for feature helpers.
   - `<feature>.docs.md` for feature documentation.
 
+## Data tables, fetching, and mutations
+
+- **Tabular lists:** use `components/data-table/data-table.tsx` with
+  `hooks/use-data-table.ts` (TanStack Table + nuqs URL state).
+- **Fetching table/list data:** API routes + TanStack React Query
+  (`useQuery` / related hooks). Do not load list pages only via server
+  components when the table needs client pagination, sort, or filters.
+- **Mutations (create/update/delete forms):** `components/ui/field.tsx` for
+  field layout, TanStack Form (`@tanstack/react-form`) for client form
+  state, and next-safe-action for server mutations (see `lib/safe.action.ts`
+  and `useAction`).
+
 ## Rules
 
 - Use `/Users/kenneth/.agents/skills/caveman/SKILL.md` communication rules when responding in this repo.
