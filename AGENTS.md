@@ -32,26 +32,40 @@ This project uses feature-based architecture.
   - `utils/` for feature helpers.
   - `<feature>.docs.md` for feature documentation.
 
-## Data tables, fetching, and mutations
+## UI patterns
 
-- **Tabular lists:** use `components/data-table/data-table.tsx` with
-  `hooks/use-data-table.ts` (TanStack Table + nuqs URL state).
-- **Fetching table/list data:** API routes + TanStack React Query
-  (`useQuery` / related hooks). Do not load list pages only via server
-  components when the table needs client pagination, sort, or filters.
-- **Mutations (create/update/delete forms):** `components/ui/field.tsx` for
-  field layout, TanStack Form (`@tanstack/react-form`) for client form
-  state, and next-safe-action for server mutations (see `lib/safe.action.ts`
-  and `useAction`).
+Follow these defaults unless an existing feature already ships a different
+approved pattern for the same surface.
+
+- **Lists / tables:** Use `components/data-table/data-table.tsx` with
+  `hooks/use-data-table.ts` (TanStack Table + nuqs URL state). Do not build
+  one-off HTML tables for content lists.
+- **Forms:** Use `components/ui/field.tsx` (and shared `components/forms/*`
+  field helpers) with TanStack Form (`@tanstack/react-form`) and server
+  actions for submit/mutate. Do not introduce alternate form libraries.
+- **Table pagination / server-filtered lists:** Paginate, sort, and filter on
+  the server. Client holds only page state (`page`, `perPage`, sort, filters
+  via `use-data-table` / nuqs) and requests that page with TanStack Query
+  (`@tanstack/react-query`) from versioned API routes under `app/api/`
+  (paths from `ROUTES.API_*` in `constants/app.routes.ts`). Client calls use
+  axios via `lib/api-client.ts` (`apiClient` — `withCredentials: true` for
+  session cookies). Do not use raw `fetch` for those same-origin API routes.
+  Do not load the full list (server component or otherwise) and slice it in
+  the browser. Client-side pagination is only for a small, already-loaded,
+  bounded set that cannot grow (not merchants, products, orders, or similar
+  content lists).
 
 ## Rules
 
 - Use `/Users/kenneth/.agents/skills/caveman/SKILL.md` communication rules when responding in this repo.
 - Keep technical substance exact; keep responses terse.
 - Read relevant guides in `node_modules/next/dist/docs/` before changing Next.js APIs, conventions, or file structure.
-- Heed Next.js deprecation notices. This project uses Next.js `16.2.6`.
+- Heed Next.js deprecation notices. This project uses Next.js `16.3.1`.
 - Keep Prisma, Better Auth, and R2 credentials server-side only.
 - Do not reintroduce Firebase.
+- Client HTTP to `ROUTES.API_*` / `app/api/**`: use `apiClient` from
+  `lib/api-client.ts` (axios). Raw `fetch` is fine only for non-app APIs
+  (e.g. R2/presigned uploads).
 - Follow existing feature patterns before adding new abstractions.
 
 ## After code changes
