@@ -50,7 +50,7 @@ const NavMain = ({ groups, pathname }: NavMainProps) => {
       {groupsWithActive.map((group) => (
         <SidebarGroup key={group.label}>
           <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-          <SidebarMenu className="gap-2">
+          <SidebarMenu>
             {group.items.map((item) => (
               <NavMainMenuItem
                 key={item.title}

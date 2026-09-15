@@ -50,9 +50,9 @@ export function DataTableToolbar<TData>({
         {isFiltered && (
           <Button
             aria-label="Reset filters"
-            variant="outline"
+            variant="dashed"
             size="sm"
-            className="w-full border-dashed sm:w-auto"
+            className="w-full sm:w-auto"
             onClick={onReset}
           >
             <IconX />
@@ -95,7 +95,8 @@ function renderNumberFilter<TData>({ column }: DataTableToolbarFilterProps<TData
         placeholder={meta?.placeholder ?? meta?.label}
         value={(column.getFilterValue() as string | undefined) ?? ""}
         onChange={(e) => column.setFilterValue(e.target.value)}
-        className={cn("h-8 w-full sm:w-[120px]", meta?.unit && "pr-8")}
+        variant={meta?.unit ? "affix" : "default"}
+        className="h-8 w-full sm:w-[120px]"
       />
       {meta?.unit && (
         <span className="absolute top-0 right-0 bottom-0 flex items-center rounded-r-md bg-accent px-2 text-sm text-muted-foreground">

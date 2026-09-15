@@ -103,14 +103,16 @@ export default function TestUIPage() {
             href={pattern.href}
             key={pattern.href}
           >
-            <Card className="h-full ring-1 ring-foreground/10 transition-[transform,box-shadow] group-hover:-translate-y-0.5 group-hover:ring-foreground/25 group-hover:shadow-md">
+            <Card className="h-full" interactive>
               <CardHeader>
-                <Badge className="w-fit font-mono" variant="secondary">
+                <Badge className="w-fit" variant="mono">
                   {pattern.badge}
                 </Badge>
-                <CardTitle className="flex items-center gap-2 font-heading">
-                  <pattern.icon className="size-5 text-muted-foreground transition-colors group-hover:text-primary" />
-                  {pattern.title}
+                <CardTitle>
+                  <span className="flex items-center gap-2">
+                    <pattern.icon className="size-5 text-muted-foreground transition-colors group-hover:text-primary" />
+                    {pattern.title}
+                  </span>
                 </CardTitle>
                 <CardDescription>{pattern.description}</CardDescription>
               </CardHeader>

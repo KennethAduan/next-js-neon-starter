@@ -94,7 +94,6 @@ export function FileUploadDemo() {
         </AttachmentContent>
         {status === "idle" || status === "error" ? (
           <AttachmentTrigger
-            className="cursor-pointer opacity-0"
             render={
               <input
                 accept="image/jpeg,image/png,image/webp,image/gif"

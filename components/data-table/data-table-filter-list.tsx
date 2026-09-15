@@ -176,8 +176,7 @@ export function DataTableFilterList<TData>({
           render={
             <Button
               variant="outline"
-              size="sm"
-              className="font-normal"
+              size="md"
               onKeyDown={onTriggerKeyDown}
               disabled={disabled}
             />
@@ -186,10 +185,7 @@ export function DataTableFilterList<TData>({
           <IconFilter className="text-muted-foreground" />
           Filter
           {filters.length > 0 && (
-            <Badge
-              variant="secondary"
-              className="h-[18.24px] rounded-[3.2px] px-[5.12px] font-mono text-[10.4px] font-normal"
-            >
+            <Badge variant="mono" className="h-[18.24px]">
               {filters.length}
             </Badge>
           )}
@@ -197,7 +193,8 @@ export function DataTableFilterList<TData>({
         <PopoverContent
           aria-describedby={descriptionId}
           aria-labelledby={labelId}
-          className="flex w-full max-w-(--available-width) flex-col gap-3.5 p-4 sm:min-w-[380px]"
+          padding="lg"
+          className="flex w-full max-w-(--available-width) flex-col sm:min-w-[380px]"
           {...props}
         >
           <div className="flex flex-col gap-1">
@@ -239,21 +236,11 @@ export function DataTableFilterList<TData>({
             </SortableContent>
           ) : null}
           <div className="flex w-full items-center gap-2">
-            <Button
-              size="sm"
-              className="rounded"
-              ref={addButtonRef}
-              onClick={onFilterAdd}
-            >
+            <Button size="md" ref={addButtonRef} onClick={onFilterAdd}>
               Add filter
             </Button>
             {filters.length > 0 ? (
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded"
-                onClick={onFiltersReset}
-              >
+              <Button variant="outline" size="md" onClick={onFiltersReset}>
                 Reset filters
               </Button>
             ) : null}
@@ -352,7 +339,7 @@ function DataTableFilterItem<TData>({
               aria-label="Select how filters combine"
               aria-controls={joinOperatorListboxId}
               size="sm"
-              className="rounded"
+              variant="md"
             >
               <SelectValue placeholder={joinOperator} />
             </SelectTrigger>
@@ -393,7 +380,8 @@ function DataTableFilterItem<TData>({
         <SelectTrigger
           aria-controls={operatorListboxId}
           size="sm"
-          className="w-36 rounded"
+          variant="md"
+          className="w-36"
         >
           <div className="truncate">
             <SelectValue placeholder={filter.operator} />
@@ -422,16 +410,13 @@ function DataTableFilterItem<TData>({
         aria-controls={filterItemId}
         variant="outline"
         size="icon"
-        className="size-8 rounded"
         onClick={() => onFilterRemove(filter.filterId)}
         onKeyDown={onItemKeyDown}
       >
         <IconTrash />
       </Button>
       <SortableItemHandle
-        render={
-          <Button variant="outline" size="icon" className="size-8 rounded" />
-        }
+        render={<Button variant="outline" size="icon" />}
       >
         <IconGripVertical />
       </SortableItemHandle>
@@ -502,7 +487,8 @@ function ListTextFilterInput<TData>({
       aria-describedby={`${inputId}-description`}
       inputMode={resolveTextFilterInputMode(filter.variant)}
       placeholder={columnMeta?.placeholder ?? "Enter a value..."}
-      className="h-8 w-full rounded"
+      className="h-8 w-full"
+      variant="md"
       value={value}
       onChange={updateFilterValue}
     />
@@ -542,7 +528,8 @@ function renderListBooleanFilter<TData>({
         aria-controls={inputListboxId}
         aria-label={`${columnMeta?.label} boolean filter`}
         size="sm"
-        className="w-full rounded"
+        variant="md"
+        className="w-full"
       >
         <SelectValue placeholder={filter.value ? "True" : "False"} />
       </SelectTrigger>
@@ -587,8 +574,8 @@ function renderListSelectFilter<TData>({
             aria-controls={inputListboxId}
             aria-label={`${columnMeta?.label} filter value${multiple ? "s" : ""}`}
             variant="outline"
-            size="sm"
-            className="w-full rounded font-normal"
+            size="md"
+            className="w-full"
           />
         }
       >
@@ -643,19 +630,16 @@ function renderListDateFilter<TData>({
             id={inputId}
             aria-controls={inputListboxId}
             aria-label={`${columnMeta?.label} date filter`}
-            variant="outline"
-            size="sm"
-            className={cn(
-              "w-full justify-start rounded text-left font-normal",
-              !filter.value && "text-muted-foreground"
-            )}
+            variant={filter.value ? "outline" : "muted"}
+            size="md"
+            className="w-full justify-start text-left"
           />
         }
       >
         <IconCalendarEvent />
         <span className="truncate">{displayValue}</span>
       </PopoverTrigger>
-      <PopoverContent id={inputListboxId} align="start" className="w-auto p-0">
+      <PopoverContent id={inputListboxId} align="start" className="w-auto" padding="none">
         <FilterDateCalendars
           filter={filter}
           dateValue={dateValue}

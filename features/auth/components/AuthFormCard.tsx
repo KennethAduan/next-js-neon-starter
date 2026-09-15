@@ -26,13 +26,17 @@ function AuthFormCard({
   beforeHeader,
   children,
 }: AuthFormCardProps) {
+  const header = (
+    <CardHeader>
+      <CardTitle>{title}</CardTitle>
+      <CardDescription>{description}</CardDescription>
+    </CardHeader>
+  )
+
   return (
     <Card>
       {beforeHeader}
-      <CardHeader className={headerClassName}>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
+      {headerClassName ? <div className={headerClassName}>{header}</div> : header}
       <CardContent>
         <form action={onSubmit}>
           <Field>{children}</Field>

@@ -39,27 +39,29 @@ export default async function AuthPatternPage() {
       />
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <CardContent className="space-y-3 pt-6">
-            <p className="text-sm text-muted-foreground">
-              This card was rendered on the server with a live{" "}
-              <code>getServerSession()</code> call.
-            </p>
-            {session ? (
-              <div className="space-y-1">
-                <p className="text-sm font-medium">Signed in</p>
-                <p className="text-sm text-muted-foreground">{session.user.email}</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Not signed in</p>
-                <p className="text-sm text-muted-foreground">
-                  Sign in to see the protected action below succeed instead of reject.
-                </p>
-                <Link className="text-sm font-medium hover:underline" href={ROUTES.LOGIN}>
-                  Go to sign in
-                </Link>
-              </div>
-            )}
+          <CardContent>
+            <div className="flex flex-col gap-3 pt-6">
+              <p className="text-sm text-muted-foreground">
+                This card was rendered on the server with a live{" "}
+                <code>getServerSession()</code> call.
+              </p>
+              {session ? (
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Signed in</p>
+                  <p className="text-sm text-muted-foreground">{session.user.email}</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Not signed in</p>
+                  <p className="text-sm text-muted-foreground">
+                    Sign in to see the protected action below succeed instead of reject.
+                  </p>
+                  <Link className="text-sm font-medium hover:underline" href={ROUTES.LOGIN}>
+                    Go to sign in
+                  </Link>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
         <div className="space-y-4">

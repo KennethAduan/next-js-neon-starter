@@ -70,6 +70,8 @@ approved pattern for the same surface.
 
 ## After code changes
 
+After making changes, run `bun run lint` and fix all errors.
+
 When done writing or changing code, always run both before considering work finished:
 
 1. React Doctor — follow `/Users/kenneth/.claude/skills/react-doctor/SKILL.md`

@@ -25,9 +25,9 @@ const BackButton = ({ className, variant = "link", path }: BackButtonProps) => {
     <Button
       variant={variant}
       onClick={navigateBack}
-      className={cn("flex w-fit cursor-pointer items-center gap-2", className)}
+      className={cn("flex w-fit cursor-pointer items-center", className)}
     >
-      <IconArrowLeft className="size-4" />
+      <IconArrowLeft className="size-4" data-icon="inline-start" />
       Back
     </Button>
   )

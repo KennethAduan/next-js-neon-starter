@@ -87,25 +87,27 @@ const ForgotPasswordPage = () => {
             may take a few minutes to arrive.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col gap-2">
-            <Button
-              onClick={handleResend}
-              disabled={countdown > 0 || loading}
-              variant="outline"
-            >
-              {countdown > 0 ? `Resend Email (${countdown}s)` : "Resend Email"}
-            </Button>
-            <Button
-              onClick={() => {
-                setShowResendLink(false)
-                setCountdown(0)
-                submittedEmailRef.current = ""
-              }}
-              variant="ghost"
-            >
-              Back to Login
-            </Button>
+        <CardContent>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Button
+                onClick={handleResend}
+                disabled={countdown > 0 || loading}
+                variant="outline"
+              >
+                {countdown > 0 ? `Resend Email (${countdown}s)` : "Resend Email"}
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowResendLink(false)
+                  setCountdown(0)
+                  submittedEmailRef.current = ""
+                }}
+                variant="ghost"
+              >
+                Back to Login
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

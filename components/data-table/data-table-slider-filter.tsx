@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
-import { cn } from "@/lib/utils"
 
 interface Range {
   min: number
@@ -142,11 +141,7 @@ export function DataTableSliderFilter<TData>({
     <Popover>
       <PopoverTrigger
         render={
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-dashed font-normal"
-          />
+          <Button variant="dashed" size="sm" />
         }
       >
         {columnFilterValue ? (
@@ -174,7 +169,7 @@ export function DataTableSliderFilter<TData>({
           </>
         ) : null}
       </PopoverTrigger>
-      <PopoverContent align="start" className="flex w-auto flex-col gap-4">
+      <PopoverContent align="start" padding="lg" className="flex w-auto flex-col">
         <div className="flex flex-col gap-3">
           <p className="leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             {title}
@@ -196,7 +191,8 @@ export function DataTableSliderFilter<TData>({
                 max={max}
                 value={range[0].toString()}
                 onChange={onFromInputChange}
-                className={cn("h-8 w-24", unit && "pr-8")}
+                variant={unit ? "affix" : "default"}
+                className="h-8 w-24"
               />
               {unit && (
                 <span className="absolute top-0 right-0 bottom-0 flex items-center rounded-r-md bg-accent px-2 text-sm text-muted-foreground">
@@ -220,7 +216,8 @@ export function DataTableSliderFilter<TData>({
                 max={max}
                 value={range[1].toString()}
                 onChange={onToInputChange}
-                className={cn("h-8 w-24", unit && "pr-8")}
+                variant={unit ? "affix" : "default"}
+                className="h-8 w-24"
               />
               {unit && (
                 <span className="absolute top-0 right-0 bottom-0 flex items-center rounded-r-md bg-accent px-2 text-sm text-muted-foreground">

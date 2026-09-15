@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getCommonPinningStyles } from "@/lib/data-table";
+import { getCommonPinningProps } from "@/lib/data-table";
 import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData> extends React.ComponentProps<"div"> {
@@ -19,7 +19,10 @@ interface DataTableProps<TData> extends React.ComponentProps<"div"> {
   actionBar?: React.ReactNode;
   /** Wraps the bordered table region (e.g. page-specific surface styling). */
   frameClassName?: string;
-  /** Applied to the inner `<table>` element. */
+  /**
+   * Extra classes on the overflow frame (same wrapper as `frameClassName`).
+   * Prefer `frameClassName`; kept for callers that previously targeted `<table>`.
+   */
   tableClassName?: string;
   /** Applied to the pagination row wrapper below the table. */
   paginationClassName?: string;
@@ -46,28 +49,43 @@ export function DataTable<TData>({
     >
       {children}
       <div
-        className={cn("overflow-hidden rounded-md border", frameClassName)}
+        className={cn(
+          "overflow-hidden rounded-md border",
+          frameClassName,
+          tableClassName,
+        )}
       >
-        <Table className={tableClassName}>
+        <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    style={{
-                      ...getCommonPinningStyles({ column: header.column }),
-                    }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  const { style, pinned } = getCommonPinningProps({
+                    column: header.column,
+                  });
+                  return (
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      pinned={pinned}
+                      style={
+                        {
+                          "--table-col-width": style["--table-col-width"],
+                          "--table-pin-start": style["--table-pin-start"],
+                          "--table-pin-end": style["--table-pin-end"],
+                          "--table-pin-z": style["--table-pin-z"],
+                        } as React.CSSProperties
+                      }
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
@@ -78,29 +96,38 @@ export function DataTable<TData>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      style={{
-                        ...getCommonPinningStyles({ column: cell.column }),
-                      }}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const { style, pinned } = getCommonPinningProps({
+                      column: cell.column,
+                    });
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        pinned={pinned}
+                        style={
+                          {
+                            "--table-col-width": style["--table-col-width"],
+                            "--table-pin-start": style["--table-pin-start"],
+                            "--table-pin-end": style["--table-pin-end"],
+                            "--table-pin-z": style["--table-pin-z"],
+                          } as React.CSSProperties
+                        }
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
               ))
             ) : (
               <TableRow>
                 <TableCell
                   colSpan={table.getAllColumns().length}
-                  className={cn(
-                    "text-center align-middle",
-                    emptyState ? "min-h-[14rem] px-6 py-10" : "h-24",
-                  )}
+                  variant={emptyState ? "empty" : "default"}
+                  className={emptyState ? "align-middle" : "h-24 text-center"}
                 >
                   {emptyState ?? "No results."}
                 </TableCell>

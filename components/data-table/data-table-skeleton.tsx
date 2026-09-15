@@ -1,3 +1,4 @@
+import type * as React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -44,7 +45,11 @@ export function DataTableSkeleton({
         <div className="flex flex-1 items-center gap-2">
           {filterCount > 0
             ? Array.from({ length: filterCount }).map((__, i) => (
-                <Skeleton key={i} className="h-7 w-18 border-dashed" />
+                <Skeleton
+                  key={i}
+                  variant="dashed"
+                  className="h-7 w-18"
+                />
               ))
             : null}
         </div>
@@ -56,35 +61,49 @@ export function DataTableSkeleton({
         <Table>
           <TableHeader>
             {Array.from({ length: 1 }).map((__, i) => (
-              <TableRow key={i} className="hover:bg-transparent">
-                {Array.from({ length: columnCount }).map((___, j) => (
-                  <TableHead
-                    key={j}
-                    style={{
-                      width: cozyCellWidths[j],
-                      minWidth: shrinkZero ? cozyCellWidths[j] : "auto",
-                    }}
-                  >
-                    <Skeleton className="h-6 w-full" />
-                  </TableHead>
-                ))}
+              <TableRow key={i} variant="static">
+                {Array.from({ length: columnCount }).map((___, j) => {
+                  const width = cozyCellWidths[j];
+                  const minWidth = shrinkZero ? cozyCellWidths[j] : "auto";
+                  return (
+                    <TableHead
+                      key={j}
+                      style={
+                        {
+                          "--skeleton-w": width,
+                          "--skeleton-min-w": minWidth,
+                        } as React.CSSProperties
+                      }
+                      className="w-(--skeleton-w) min-w-(--skeleton-min-w)"
+                    >
+                      <Skeleton className="h-6 w-full" />
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
             {Array.from({ length: rowCount }).map((__, i) => (
-              <TableRow key={i} className="hover:bg-transparent">
-                {Array.from({ length: columnCount }).map((___, j) => (
-                  <TableCell
-                    key={j}
-                    style={{
-                      width: cozyCellWidths[j],
-                      minWidth: shrinkZero ? cozyCellWidths[j] : "auto",
-                    }}
-                  >
-                    <Skeleton className="h-6 w-full" />
-                  </TableCell>
-                ))}
+              <TableRow key={i} variant="static">
+                {Array.from({ length: columnCount }).map((___, j) => {
+                  const width = cozyCellWidths[j];
+                  const minWidth = shrinkZero ? cozyCellWidths[j] : "auto";
+                  return (
+                    <TableCell
+                      key={j}
+                      style={
+                        {
+                          "--skeleton-w": width,
+                          "--skeleton-min-w": minWidth,
+                        } as React.CSSProperties
+                      }
+                      className="w-(--skeleton-w) min-w-(--skeleton-min-w)"
+                    >
+                      <Skeleton className="h-6 w-full" />
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             ))}
           </TableBody>

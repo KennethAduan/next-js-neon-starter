@@ -1,10 +1,22 @@
 import { cn } from "@/lib/utils"
 
-function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
+function Skeleton({
+  className,
+  variant = "default",
+  ...props
+}: React.ComponentProps<"div"> & {
+  variant?: "default" | "dashed"
+}) {
   return (
     <div
       data-slot="skeleton"
-      className={cn("animate-pulse rounded-md bg-muted", className)}
+      data-variant={variant}
+      className={cn(
+        "animate-pulse bg-muted",
+        variant === "default" && "rounded-md",
+        variant === "dashed" && "rounded-md border border-dashed",
+        className
+      )}
       {...props}
     />
   )

@@ -65,8 +65,8 @@ export const userColumns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const status = row.getValue<User["status"]>("status");
       return (
-        <Badge variant={statusVariantMap[status]} className="capitalize">
-          {status}
+        <Badge variant={statusVariantMap[status]}>
+          <span className="capitalize">{status}</span>
         </Badge>
       );
     },
@@ -145,9 +145,7 @@ export const userColumns: ColumnDef<User>[] = [
         <DropdownMenuContent align="end">
           <DropdownMenuItem>View</DropdownMenuItem>
           <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem className="text-destructive focus:text-destructive">
-            Delete
-          </DropdownMenuItem>
+          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     ),

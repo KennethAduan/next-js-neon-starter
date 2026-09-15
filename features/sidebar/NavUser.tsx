@@ -33,9 +33,9 @@ function UserInfo({
 }) {
   return (
     <>
-      <Avatar className="size-8 rounded-lg">
+      <Avatar className="size-8" shape="square">
         <AvatarImage src={user.avatar} alt={user.name} />
-        <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+        <AvatarFallback>CN</AvatarFallback>
       </Avatar>
       <div className="grid flex-1 text-left text-sm leading-tight">
         <span className="truncate font-medium">{user.name}</span>
@@ -59,22 +59,19 @@ export function NavUser({
 
   return (
     <>
-      <SidebarMenu>
+      <SidebarMenu size="compact">
         <SidebarMenuItem>
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                >
+                <SidebarMenuButton size="lg">
                   <UserInfo user={user} />
                   <IconDotsVertical className="ml-auto size-4" />
                 </SidebarMenuButton>
               }
             />
             <DropdownMenuContent
-              className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+              className="w-(--radix-dropdown-menu-trigger-width) min-w-56"
               side={isMobile ? "bottom" : "right"}
               align="end"
               sideOffset={4}

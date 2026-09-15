@@ -152,8 +152,7 @@ export function DataTableSortList<TData>({
           render={
             <Button
               variant="outline"
-              size="sm"
-              className="font-normal"
+              size="md"
               onKeyDown={onTriggerKeyDown}
               disabled={disabled}
             />
@@ -162,10 +161,7 @@ export function DataTableSortList<TData>({
           <IconArrowsDownUp className="text-muted-foreground" />
           Sort
           {sorting.length > 0 && (
-            <Badge
-              variant="secondary"
-              className="h-[18.24px] rounded-[3.2px] px-[5.12px] font-mono text-[10.4px] font-normal"
-            >
+            <Badge variant="mono" className="h-[18.24px]">
               {sorting.length}
             </Badge>
           )}
@@ -173,7 +169,8 @@ export function DataTableSortList<TData>({
         <PopoverContent
           aria-labelledby={labelId}
           aria-describedby={descriptionId}
-          className="flex w-full max-w-(--available-width) flex-col gap-3.5 p-4 sm:min-w-[380px]"
+          padding="lg"
+          className="flex w-full max-w-(--available-width) flex-col sm:min-w-[380px]"
           {...props}
         >
           <div className="flex flex-col gap-1">
@@ -214,8 +211,7 @@ export function DataTableSortList<TData>({
           )}
           <div className="flex w-full items-center gap-2">
             <Button
-              size="sm"
-              className="rounded"
+              size="md"
               ref={addButtonRef}
               onClick={onSortAdd}
               disabled={columns.length === 0}
@@ -223,12 +219,7 @@ export function DataTableSortList<TData>({
               Add sort
             </Button>
             {sorting.length > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded"
-                onClick={onSortingReset}
-              >
+              <Button variant="outline" size="md" onClick={onSortingReset}>
                 Reset sorting
               </Button>
             )}
@@ -309,15 +300,15 @@ function DataTableSortItem({
               id={fieldTriggerId}
               aria-controls={fieldListboxId}
               variant="outline"
-              size="sm"
-              className="w-44 justify-between rounded font-normal"
+              size="md"
+              className="w-44 justify-between"
             />
           }
         >
           <span className="truncate">{columnLabels.get(sort.id)}</span>
           <IconArrowsUpDown className="opacity-50" />
         </PopoverTrigger>
-        <PopoverContent id={fieldListboxId} className="w-(--anchor-width) p-0">
+        <PopoverContent id={fieldListboxId} className="w-(--anchor-width)" padding="none">
           <Command>
             <CommandInput placeholder="Search fields..." />
             <CommandList>
@@ -348,7 +339,8 @@ function DataTableSortItem({
         <SelectTrigger
           aria-controls={directionListboxId}
           size="sm"
-          className="w-32 rounded"
+          variant="md"
+          className="w-32"
         >
           <SelectValue />
         </SelectTrigger>
@@ -367,7 +359,7 @@ function DataTableSortItem({
         aria-controls={sortItemId}
         variant="outline"
         size="icon"
-        className="size-8 shrink-0 rounded"
+        className="shrink-0"
         onClick={() => onSortRemove(sort.id)}
         onKeyDown={onItemKeyDown}
       >
@@ -375,11 +367,7 @@ function DataTableSortItem({
       </Button>
       <SortableItemHandle
         render={
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-8 shrink-0 rounded"
-          />
+          <Button variant="outline" size="icon" className="shrink-0" />
         }
       >
         <IconGripVertical />

@@ -52,8 +52,8 @@ export function DataTableViewOptions<TData>({
             aria-label="Toggle columns"
             role="combobox"
             variant="outline"
-            size="sm"
-            className="ml-auto hidden h-8 font-normal lg:flex"
+            size="md"
+            className="ml-auto hidden lg:flex"
             disabled={disabled}
           />
         }
@@ -61,7 +61,7 @@ export function DataTableViewOptions<TData>({
         <IconSettings className="text-muted-foreground" />
         View
       </PopoverTrigger>
-      <PopoverContent id={contentId} className="w-44 p-0" {...props}>
+      <PopoverContent id={contentId} className="w-44" padding="none" {...props}>
         <Command>
           <CommandInput placeholder="Search columns..." />
           <CommandList>

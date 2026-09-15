@@ -18,9 +18,7 @@ export function PatternHeader({
 }) {
   return (
     <div className="mb-6 space-y-3">
-      <Badge className="font-mono" variant="secondary">
-        {badge}
-      </Badge>
+      <Badge variant="mono">{badge}</Badge>
       <h1 className="flex items-center gap-2 font-heading text-2xl font-semibold tracking-tight">
         <span className="text-muted-foreground">{icon}</span> {title}
       </h1>

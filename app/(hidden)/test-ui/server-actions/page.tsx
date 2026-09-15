@@ -28,8 +28,10 @@ export default async function ServerActionPatternPage() {
       />
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <CardContent className="pt-6">
-            <ServerActionDemo />
+          <CardContent>
+            <div className="pt-6">
+              <ServerActionDemo />
+            </div>
           </CardContent>
         </Card>
         <CodeBlock code={source} filePath={SOURCE_PATH} />

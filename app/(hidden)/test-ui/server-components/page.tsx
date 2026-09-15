@@ -36,25 +36,27 @@ export default async function ServerComponentPatternPage() {
       />
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <CardContent className="space-y-3 pt-6">
-            <p className="text-sm text-muted-foreground">
-              This card was rendered on the server with a live Prisma read against the{" "}
-              <code>Client</code> model. No client fetch, no loading state.
-            </p>
-            <p className="text-2xl font-semibold">{clientCount} clients total</p>
-            <ul className="space-y-1 text-sm">
-              {recentClients.map((client) => (
-                <li className="flex items-center justify-between gap-2" key={client.id}>
-                  <span>{client.fullName}</span>
-                  <span className="text-muted-foreground">{client.email ?? "—"}</span>
-                </li>
-              ))}
-            </ul>
-            {recentClients.length === 0 ? (
+          <CardContent>
+            <div className="flex flex-col gap-3 pt-6">
               <p className="text-sm text-muted-foreground">
-                No clients yet. Create one to see it appear here on next request.
+                This card was rendered on the server with a live Prisma read against the{" "}
+                <code>Client</code> model. No client fetch, no loading state.
               </p>
-            ) : null}
+              <p className="text-2xl font-semibold">{clientCount} clients total</p>
+              <ul className="space-y-1 text-sm">
+                {recentClients.map((client) => (
+                  <li className="flex items-center justify-between gap-2" key={client.id}>
+                    <span>{client.fullName}</span>
+                    <span className="text-muted-foreground">{client.email ?? "—"}</span>
+                  </li>
+                ))}
+              </ul>
+              {recentClients.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No clients yet. Create one to see it appear here on next request.
+                </p>
+              ) : null}
+            </div>
           </CardContent>
         </Card>
         <CodeBlock code={source} filePath={SOURCE_PATH} />

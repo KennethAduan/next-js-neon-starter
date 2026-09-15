@@ -202,9 +202,9 @@ const AccountPage = () => {
             className="flex flex-col gap-6"
           >
             <div className="flex flex-col items-center gap-3 text-center">
-              <Avatar className="size-24 rounded-xl">
+              <Avatar className="size-24" shape="square" size="lg">
                 <AvatarImage src={avatarSrc} alt="" />
-                <AvatarFallback className="rounded-xl text-lg">
+                <AvatarFallback>
                   {displayUser?.firstName?.[0]}
                   {displayUser?.lastName?.[0]}
                 </AvatarFallback>
@@ -257,12 +257,14 @@ const AccountPage = () => {
             {displayUser?.roles && displayUser.roles.length > 0 ? (
               <Field>
                 <FieldTitle>Roles</FieldTitle>
-                <FieldContent className="flex flex-wrap gap-1.5">
-                  {displayUser.roles.map((role) => (
-                    <Badge key={role} variant="secondary">
-                      {role.replaceAll("_", " ")}
-                    </Badge>
-                  ))}
+                <FieldContent>
+                  <div className="flex flex-wrap gap-1.5">
+                    {displayUser.roles.map((role) => (
+                      <Badge key={role} variant="secondary">
+                        {role.replaceAll("_", " ")}
+                      </Badge>
+                    ))}
+                  </div>
                 </FieldContent>
               </Field>
             ) : null}

@@ -32,8 +32,10 @@ export default async function ClientStatePatternPage() {
       />
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <CardContent className="pt-6">
-            <ClientStateDemo />
+          <CardContent>
+            <div className="pt-6">
+              <ClientStateDemo />
+            </div>
           </CardContent>
         </Card>
         <div className="space-y-4">

@@ -10,7 +10,7 @@ import Link from "next/link"
 const AppSidebarHeader = () => {
   return (
     <SidebarHeader>
-      <SidebarMenu>
+      <SidebarMenu size="compact">
         <SidebarMenuItem>
           <SidebarMenuButton
             size="lg"

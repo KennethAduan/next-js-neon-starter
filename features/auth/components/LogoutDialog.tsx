@@ -59,7 +59,7 @@ const LogoutDialog = ({ open, onOpenChange }: LogoutDialogProps) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold">
+          <DialogTitle className="text-center">
             Logout
           </DialogTitle>
           <DialogDescription className="text-center">
