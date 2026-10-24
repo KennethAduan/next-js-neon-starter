@@ -14,6 +14,7 @@ import { createUserSearchFields } from "@/lib/search/create-user-search-fields"
 import { auth } from "@/features/auth/server/auth"
 import { headers } from "next/headers"
 import { mapUserToClient } from "@/features/users/server/map-user"
+import { serializeRoles } from "@/features/users/server/user-roles"
 
 export const RegsiterAdminAction = actionClient
   .metadata({ actionName: "registerAdmin" })
@@ -74,7 +75,7 @@ export const RegsiterAdminAction = actionClient
           firstName,
           lastName,
           phoneNumber: "",
-          roles,
+          roles: serializeRoles(roles),
           emailVerified: true,
           ...search,
         },

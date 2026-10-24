@@ -20,6 +20,30 @@ interface DataTableSkeletonProps extends React.ComponentProps<"div"> {
   shrinkZero?: boolean;
 }
 
+function SkeletonCell({
+  as: Cell,
+  width,
+  shrinkZero,
+}: {
+  as: typeof TableHead | typeof TableCell;
+  width: string;
+  shrinkZero: boolean;
+}) {
+  return (
+    <Cell
+      style={
+        {
+          "--skeleton-w": width,
+          "--skeleton-min-w": shrinkZero ? width : "auto",
+        } as React.CSSProperties
+      }
+      className="w-(--skeleton-w) min-w-(--skeleton-min-w)"
+    >
+      <Skeleton className="h-6 w-full" />
+    </Cell>
+  );
+}
+
 export function DataTableSkeleton({
   columnCount,
   rowCount = 10,
@@ -62,48 +86,28 @@ export function DataTableSkeleton({
           <TableHeader>
             {Array.from({ length: 1 }).map((__, i) => (
               <TableRow key={i} variant="static">
-                {Array.from({ length: columnCount }).map((___, j) => {
-                  const width = cozyCellWidths[j];
-                  const minWidth = shrinkZero ? cozyCellWidths[j] : "auto";
-                  return (
-                    <TableHead
-                      key={j}
-                      style={
-                        {
-                          "--skeleton-w": width,
-                          "--skeleton-min-w": minWidth,
-                        } as React.CSSProperties
-                      }
-                      className="w-(--skeleton-w) min-w-(--skeleton-min-w)"
-                    >
-                      <Skeleton className="h-6 w-full" />
-                    </TableHead>
-                  );
-                })}
+                {cozyCellWidths.map((width, j) => (
+                  <SkeletonCell
+                    key={j}
+                    as={TableHead}
+                    width={width}
+                    shrinkZero={shrinkZero}
+                  />
+                ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
             {Array.from({ length: rowCount }).map((__, i) => (
               <TableRow key={i} variant="static">
-                {Array.from({ length: columnCount }).map((___, j) => {
-                  const width = cozyCellWidths[j];
-                  const minWidth = shrinkZero ? cozyCellWidths[j] : "auto";
-                  return (
-                    <TableCell
-                      key={j}
-                      style={
-                        {
-                          "--skeleton-w": width,
-                          "--skeleton-min-w": minWidth,
-                        } as React.CSSProperties
-                      }
-                      className="w-(--skeleton-w) min-w-(--skeleton-min-w)"
-                    >
-                      <Skeleton className="h-6 w-full" />
-                    </TableCell>
-                  );
-                })}
+                {cozyCellWidths.map((width, j) => (
+                  <SkeletonCell
+                    key={j}
+                    as={TableCell}
+                    width={width}
+                    shrinkZero={shrinkZero}
+                  />
+                ))}
               </TableRow>
             ))}
           </TableBody>

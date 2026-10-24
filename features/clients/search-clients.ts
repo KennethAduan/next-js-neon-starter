@@ -62,7 +62,7 @@ async function queryClientsByPrefixField(
   status?: SearchClientsInput["status"]
 ) {
   const where: Prisma.ClientWhereInput = {
-    [field]: { startsWith: start, mode: "insensitive" },
+    [field]: { startsWith: start },
     ...(status ? { status } : {}),
   }
 

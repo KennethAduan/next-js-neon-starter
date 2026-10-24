@@ -112,83 +112,94 @@ function shouldAllowKey(
   return /^\d$/.test(e.key)
 }
 
-function CustomInputNumber({
-  value,
-  onChange,
-  min,
-  max,
-  step = 1,
-  allowDecimals = true,
-  allowNegative = false,
-  className,
-  onFocus,
-  onBlur,
-  onKeyDown,
-  ref,
-  ...props
-}: CustomInputNumberProps & { ref?: Ref<HTMLInputElement> }) {
+function formatValue(rawValue: number | string | undefined): string {
+  if (rawValue === undefined || rawValue === null || rawValue === "") return ""
+  return String(rawValue)
+}
+
+type TypedChange =
+  | { display: string; emit: true; value: number | undefined }
+  | { display: string; emit: false }
+
+/** Returns null when the typed text must be rejected. */
+function resolveTypedChange(
+  next: string,
+  allowDecimals: boolean,
+  allowNegative: boolean
+): TypedChange | null {
+  if (next === "") return { display: "", emit: true, value: undefined }
+  if (isInvalidInput(next, allowDecimals, allowNegative)) return null
+  if (isIncompleteNumericInput(next))
+    return { display: next, emit: true, value: undefined }
+  const num = parseFloat(next)
+  return isNaN(num)
+    ? { display: next, emit: false }
+    : { display: next, emit: true, value: num }
+}
+
+function resolveCommittedValue(
+  raw: string,
+  min: number | undefined,
+  max: number | undefined,
+  step: number,
+  allowDecimals: boolean
+): number | undefined {
+  const next = raw.trim()
+  if (!next || isIncompleteNumericInput(next)) return undefined
+  const num = parseFloat(next)
+  if (isNaN(num)) return undefined
+  return applyNumericConstraints(num, min, max, step, allowDecimals)
+}
+
+function useNumericInput(
+  {
+    value,
+    onChange,
+    min,
+    max,
+    step = 1,
+    allowDecimals = true,
+    allowNegative = false,
+    onFocus,
+    onBlur,
+    onKeyDown,
+    ...props
+  }: Omit<CustomInputNumberProps, "className">,
+  ref: Ref<HTMLInputElement> | undefined
+): React.ComponentProps<"input"> {
   const inputRef = useRef<HTMLInputElement>(null)
   const composedRef = useComposedRefs(ref, inputRef)
-  const isFocusedRef = useRef(false)
   const [isFocused, setIsFocused] = useState(false)
-
-  const formatValue = useCallback((rawValue: number | string | undefined) => {
-    if (rawValue === undefined || rawValue === null || rawValue === "")
-      return ""
-    return String(rawValue)
-  }, [])
 
   const [inputValue, setInputValue] = useState(() => formatValue(value))
   const displayValue = isFocused ? inputValue : formatValue(value)
 
   const updateNumericValue = useCallback(
-    // fallow-ignore-next-line complexity
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const next = e.target.value
-      if (next === "") {
-        setInputValue("")
-        onChange?.(undefined)
-        return
-      }
-      if (isInvalidInput(next, allowDecimals, allowNegative)) return
-      setInputValue(next)
-      if (isIncompleteNumericInput(next)) {
-        onChange?.(undefined)
-        return
-      }
-      const num = parseFloat(next)
-      if (!isNaN(num)) onChange?.(num)
+      const change = resolveTypedChange(
+        e.target.value,
+        allowDecimals,
+        allowNegative
+      )
+      if (!change) return
+      setInputValue(change.display)
+      if (change.emit) onChange?.(change.value)
     },
     [onChange, allowDecimals, allowNegative]
   )
 
   const commitNumericValue = useCallback(
-    // fallow-ignore-next-line complexity
     (e: React.FocusEvent<HTMLInputElement>) => {
-      isFocusedRef.current = false
       setIsFocused(false)
-      const next = e.target.value.trim()
-      if (!next || isIncompleteNumericInput(next)) {
-        setInputValue("")
-        onChange?.(undefined)
-        onBlur?.(e)
-        return
-      }
-      const num = parseFloat(next)
-      if (isNaN(num)) {
-        setInputValue("")
-        onChange?.(undefined)
-      } else {
-        const final = applyNumericConstraints(
-          num,
-          min,
-          max,
-          step,
-          allowDecimals
-        )
-        setInputValue(String(final))
-        onChange?.(final)
-      }
+      const final = resolveCommittedValue(
+        e.target.value,
+        min,
+        max,
+        step,
+        allowDecimals
+      )
+      setInputValue(final === undefined ? "" : String(final))
+      onChange?.(final)
       onBlur?.(e)
     },
     [onChange, onBlur, min, max, step, allowDecimals]
@@ -196,12 +207,11 @@ function CustomInputNumber({
 
   const startEditingNumber = useCallback(
     (e: React.FocusEvent<HTMLInputElement>) => {
-      isFocusedRef.current = true
       setIsFocused(true)
       setInputValue(formatValue(value))
       onFocus?.(e)
     },
-    [onFocus, formatValue, value]
+    [onFocus, value]
   )
 
   const handleKeyDown = useCallback(
@@ -213,20 +223,27 @@ function CustomInputNumber({
     [allowDecimals, allowNegative, onKeyDown]
   )
 
-  return (
-    <Input
-      {...props}
-      ref={composedRef}
-      type="text"
-      inputMode={allowDecimals ? "decimal" : "numeric"}
-      value={displayValue}
-      onChange={updateNumericValue}
-      onFocus={startEditingNumber}
-      onBlur={commitNumericValue}
-      onKeyDown={handleKeyDown}
-      className={cn(className)}
-    />
-  )
+  return {
+    ...props,
+    ref: composedRef,
+    type: "text",
+    inputMode: allowDecimals ? "decimal" : "numeric",
+    value: displayValue,
+    onChange: updateNumericValue,
+    onFocus: startEditingNumber,
+    onBlur: commitNumericValue,
+    onKeyDown: handleKeyDown,
+  }
+}
+
+function CustomInputNumber({
+  className,
+  ref,
+  ...props
+}: CustomInputNumberProps & { ref?: Ref<HTMLInputElement> }) {
+  const inputProps = useNumericInput(props, ref)
+
+  return <Input {...inputProps} className={cn(className)} />
 }
 
 export default CustomInputNumber
