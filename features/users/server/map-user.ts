@@ -1,6 +1,7 @@
 import type { UserWithoutPassword } from "@/features/users/schema/user.schema"
 import { extractObjectKey } from "@/lib/storage/object-path"
 import { resolveObjectReadUrl } from "@/lib/storage/r2.server"
+import { parseRoles, type UserRolesColumn } from "./user-roles"
 
 export type UserRecordForMap = {
   id: string
@@ -9,7 +10,7 @@ export type UserRecordForMap = {
   lastName: string
   phoneNumber: string
   image: string | null
-  roles: string[]
+  roles: UserRolesColumn
   searchFirstName: string
   searchLastName: string
   searchFullName: string
@@ -29,7 +30,7 @@ export async function mapUserToClient(
     lastName: user.lastName,
     phoneNumber: user.phoneNumber,
     photoURL: key ? await resolveObjectReadUrl(key) : null,
-    roles: user.roles,
+    roles: parseRoles(user.roles),
     searchFirstName: user.searchFirstName,
     searchLastName: user.searchLastName,
     searchFullName: user.searchFullName,

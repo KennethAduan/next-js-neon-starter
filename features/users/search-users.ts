@@ -9,6 +9,7 @@ import { throwSearchActionError } from "@/lib/search/throw-search-action-error"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 import { Prisma } from "@/generated/prisma/client"
+import { rolesFilter } from "@/features/users/server/user-roles"
 
 const SearchUsersInputSchema = z.object({
   term: z.string().trim().min(1, { message: "Search term is required" }),
@@ -29,8 +30,8 @@ async function queryUsersByPrefixField(
   role?: string
 ) {
   const where: Prisma.UserWhereInput = {
-    [field]: { startsWith: start, mode: "insensitive" },
-    ...(role ? { roles: { has: role } } : {}),
+    [field]: { startsWith: start },
+    ...(role ? rolesFilter(role) : {}),
   }
 
   const users = await prisma.user.findMany({

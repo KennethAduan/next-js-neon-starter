@@ -10,9 +10,9 @@ coverage
 .DS_Store
 *.pem
 *.log
-.env
-.env.*
 !.env.example
 /generated/prisma
+*.db
+*.db-journal
 tsconfig.tsbuildinfo
 graphify-out
