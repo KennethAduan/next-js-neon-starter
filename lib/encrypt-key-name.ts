@@ -1,4 +1,5 @@
-import CryptoJS from "crypto-js";
+import { sha256 } from "@noble/hashes/sha2.js";
+import { bytesToHex, utf8ToBytes } from "@noble/hashes/utils.js";
 import { env } from "@/config/env";
 
 /**
@@ -27,7 +28,7 @@ export const encryptKeyName = (keyName: string): string => {
   // Use SHA256 hash for consistent, one-way encryption of key names
   // This ensures the same key always produces the same encrypted key name
   // The encryption key is included to make the hash unique to this application
-  return CryptoJS.SHA256(
-    `${keyName}_${env.NEXT_PUBLIC_ENCRYPTION_KEY}`
-  ).toString();
+  return bytesToHex(
+    sha256(utf8ToBytes(`${keyName}_${env.NEXT_PUBLIC_ENCRYPTION_KEY}`))
+  );
 };
