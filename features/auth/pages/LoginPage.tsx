@@ -18,7 +18,7 @@ const LoginPage = () => {
   return (
     <AuthFormCard
       title="Welcome back"
-      description="Sign in to Neon Starter to continue"
+      description="Sign in to Team Todos to continue"
       headerClassName="text-center"
       onSubmit={() => form.handleSubmit()}
     >

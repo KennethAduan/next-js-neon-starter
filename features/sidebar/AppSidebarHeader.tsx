@@ -5,8 +5,9 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
 import { ROUTES } from "@/constants"
-import Image from "next/image"
+import { IconChecklist } from "@tabler/icons-react"
 import Link from "next/link"
+
 const AppSidebarHeader = () => {
   return (
     <SidebarHeader>
@@ -14,20 +15,15 @@ const AppSidebarHeader = () => {
         <SidebarMenuItem>
           <SidebarMenuButton
             size="lg"
-            tooltip="Firebase Starter"
+            tooltip="Team Todos"
             render={<Link href={ROUTES.HOME} className="w-full" />}
           >
-            <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg">
-              <Image
-                src="/main_logo.png"
-                alt="Firebase Starter"
-                width={32}
-                height={32}
-              />
+            <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-brand text-brand-foreground">
+              <IconChecklist className="size-4" aria-hidden />
             </div>
-            <div className="grid flex-1 text-center leading-tight group-data-[collapsible=icon]:hidden">
-              <span className="text-lg font-bold text-primary">
-               Neon Starter
+            <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
+              <span className="text-base font-semibold tracking-tight text-foreground">
+                Team Todos
               </span>
             </div>
           </SidebarMenuButton>

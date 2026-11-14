@@ -30,6 +30,7 @@ async function queryUsersByPrefixField(
   role?: string
 ) {
   const where: Prisma.UserWhereInput = {
+    // SQLite has no Prisma `mode: "insensitive"`; store search* fields lowercased.
     [field]: { startsWith: start },
     ...(role ? rolesFilter(role) : {}),
   }

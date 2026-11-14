@@ -14,7 +14,7 @@ import {
 import { useBreadcrumbLabels } from "./BreadcrumbLabelContext"
 
 const ROUTE_LABEL_MAP: Record<string, string> = {
-  [ROUTES.HOME]: "Home",
+  [ROUTES.HOME]: "Dashboard",
 }
 
 const UUID_RE =

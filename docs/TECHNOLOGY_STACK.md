@@ -15,8 +15,8 @@ duplicate this operational detail.
 - Framework: Next.js `16.3.1`
 - Runtime and package manager: Bun
 - Hosting: Vercel
-- Database: Neon PostgreSQL
-- ORM and migrations: Prisma
+- Database: SQLite (local file via `DATABASE_URL=file:./prisma/dev.db`)
+- ORM and migrations: Prisma (`@prisma/adapter-libsql` for Bun)
 - Authentication: Better Auth
 - Object storage: Cloudflare R2
 - Validation: Zod
@@ -464,9 +464,8 @@ Create `.env.local` from `.env.example`. Never commit either real credentials or
 provider connection strings.
 
 ```dotenv
-# Neon / Prisma
-# Use Neon's pooled URL for normal application requests.
-DATABASE_URL="postgresql://USER:PASSWORD@HOST/DB?sslmode=verify-full"
+# SQLite / Prisma (path relative to project root)
+DATABASE_URL="file:./prisma/dev.db"
 
 # Better Auth
 BETTER_AUTH_SECRET="generate-a-long-random-secret"
@@ -492,13 +491,14 @@ R2_ENDPOINT="https://<account-id>.r2.cloudflarestorage.com"
 
 ## Database and Prisma
 
-- Neon PostgreSQL is the system of record for relational application data.
+- Local SQLite (`prisma/dev.db`) is the system of record for relational
+  application data in this MVP. `*.db` / `*.db-journal` are gitignored.
 - Define schema, relations, constraints, and migrations in Prisma. Apply
   production migrations through the repository's reviewed deployment workflow;
   never run ad-hoc schema changes against production.
-- Use a pooled Neon connection for request-heavy Vercel runtime paths to avoid
-  connection exhaustion. Use a direct connection only for tooling that requires
-  it.
+- SQLite is a single local file. Fine for solo/team MVP on one machine. For
+  multi-instance Vercel production, switch back to a networked database
+  (e.g. Neon) before scaling.
 - Keep database access in a feature's `server/` layer. Authorization belongs
   beside each query/mutation, not only in the UI.
 - Validate all action and route input with Zod before database work. Use

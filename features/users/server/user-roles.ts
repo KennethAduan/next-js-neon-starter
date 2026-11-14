@@ -1,6 +1,6 @@
 import type { Prisma } from "@/generated/prisma/client"
 
-/** SQLite has no scalar lists, so roles are stored as a JSON string. */
+/** SQLite stores roles as a JSON-encoded string. */
 export type UserRolesColumn = string
 
 export function serializeRoles(roles: string[]): UserRolesColumn {
@@ -10,14 +10,15 @@ export function serializeRoles(roles: string[]): UserRolesColumn {
 export function parseRoles(roles: UserRolesColumn): string[] {
   try {
     const parsed: unknown = JSON.parse(roles)
-    return Array.isArray(parsed)
-      ? parsed.filter((role): role is string => typeof role === "string")
-      : []
+    if (!Array.isArray(parsed)) {
+      return []
+    }
+    return parsed.filter((role): role is string => typeof role === "string")
   } catch {
     return []
   }
 }
 
 export function rolesFilter(role: string): Prisma.UserWhereInput {
-  return { roles: { contains: JSON.stringify(role) } }
+  return { roles: { contains: `"${role}"` } }
 }

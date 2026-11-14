@@ -14,8 +14,8 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "FXP PDF Generator",
-  description: "FXP PDF Generator",
+  title: "Team Todos",
+  description: "Shared team todo list",
 }
 
 export default function RootLayout({
