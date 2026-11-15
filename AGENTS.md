@@ -13,6 +13,7 @@ storage, or deployment.
 - Build: `bun run build`
 - Lint: `bun run lint`
 - Typecheck: `bun run typecheck`
+- Test: `bun test`
 - DB generate: `bun run db:generate`
 - DB migrate: `bun run db:migrate`
 
@@ -30,6 +31,8 @@ This project uses feature-based architecture.
   - `server/` for server-only feature code.
   - `atom/` for feature state.
   - `utils/` for feature helpers.
+  - `tests/` for feature unit tests (colocated; do not park them in a
+    repo-root `__tests__` dump).
   - `<feature>.docs.md` for feature documentation.
 
 ## UI patterns
@@ -67,10 +70,14 @@ approved pattern for the same surface.
   `lib/api-client.ts` (axios). Raw `fetch` is fine only for non-app APIs
   (e.g. R2/presigned uploads).
 - Follow existing feature patterns before adding new abstractions.
+- Put unit tests under `features/<feature-name>/tests/`. Name files
+  `*.test.ts` or `*.test.tsx`. Cover new or changed feature logic
+  (utils, actions, hooks, server helpers) in that feature's `tests/`.
 
 ## After code changes
 
 After making changes, run `bun run lint` and fix all errors.
+Run `bun test` for touched features (or the full suite) and fix failures.
 
 When done writing or changing code, always run both before considering work finished:
 
